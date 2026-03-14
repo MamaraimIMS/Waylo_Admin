@@ -732,7 +732,7 @@ function buildForm(rec) {
       var galleryVal=[];
       try{ if(val) galleryVal=typeof val==='string'?JSON.parse(val):val; }catch(e){}
       h+='<div class="fg ffull">';
-      h+='<label class="flabel">Галерея (до 50 фото, макс. 200 KB каждое)</label>';
+      h+='<label class="flabel">Галерея (до 50 фото, макс. 100 KB каждое)</label>';
       h+='<div id="gallery-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px">';
       if(Array.isArray(galleryVal)) galleryVal.forEach(function(url,i){ h+=buildGalleryThumb(i,url); });
       h+='</div>';
@@ -776,10 +776,7 @@ var ROOM_TYPES=[
 ];
 
 function buildRoomRow(i,r){
-  var idOpts='';
-  for(var n=1;n<=20;n++) idOpts+='<option value="'+n+'"'+(+r.room_id===n?' selected':'')+'>'+n+'</option>';
-  return '<div class="room-row" id="room-row-'+i+'" style="grid-template-columns:60px 2fr 1fr 1fr 1fr auto">'+
-    '<div><span class="flabel">ID фото</span><select class="fsel2" id="room-id-'+i+'">'+idOpts+'</select></div>'+
+  return '<div class="room-row" id="room-row-'+i+'" style="grid-template-columns:2fr 1fr 1fr 1fr auto">'+
     '<div><span class="flabel">Тип номера</span><input class="fi" id="room-type-'+i+'" type="text" value="'+(r.type||'')+'" placeholder="Введите тип номера..."></div>'+
     '<div><span class="flabel">Цена ($)</span><input class="fi" id="room-price-'+i+'" type="number" value="'+(r.price||'')+'" placeholder="0"></div>'+
     '<div><span class="flabel">Сезон с</span><input class="fi" id="room-from-'+i+'" type="date" value="'+(r.date_from||'')+'"></div>'+
@@ -816,13 +813,11 @@ function collectRooms(){
   var rows=[];
   list.querySelectorAll('[id^="room-row-"]').forEach(function(el){
     var i=el.id.replace('room-row-','');
-    var id=document.getElementById('room-id-'+i);
     var t=document.getElementById('room-type-'+i);
     var p=document.getElementById('room-price-'+i);
     var f=document.getElementById('room-from-'+i);
     var o=document.getElementById('room-to-'+i);
     if(t) rows.push({
-      room_id: id?+id.value:1,
       type: t.value,
       price: p?+p.value||0:0,
       date_from: f?f.value:'',
@@ -862,7 +857,7 @@ function handleGalleryUpload(e){
   if(allowed<=0){showToast('Галерея заполнена (50 фото макс.)','red');return;}
   var added=0; var errors=[];
   files.slice(0,allowed).forEach(function(file){
-    if(file.size>200*1024){errors.push(file.name+' > 200 KB');return;}
+    if(file.size>100*1024){errors.push(file.name+' > 100 KB');return;}
     if(!file.type.startsWith('image/')){return;}
     var reader=new FileReader();
     reader.onload=function(ev){
