@@ -111,7 +111,7 @@ tr:hover .racts{opacity:1}
 .flight-card{background:var(--surf2);border:1px solid var(--b);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;margin-bottom:8px}
 .movl{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
 .movl.open{opacity:1;pointer-events:all}
-.modal{background:var(--surf);border:1px solid var(--b2);border-radius:16px;width:580px;max-width:95vw;max-height:90vh;overflow-y:auto;transform:translateY(10px);transition:transform .2s}
+.modal{background:var(--surf);border:1px solid var(--b2);border-radius:16px;width:920px;max-width:97vw;max-height:90vh;overflow-y:auto;transform:translateY(10px);transition:transform .2s}
 .movl.open .modal{transform:translateY(0)}
 .modal::-webkit-scrollbar{width:4px}
 .modal::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
@@ -229,7 +229,7 @@ tr:hover .racts{opacity:1}
 </div>
 
 <div class="movl" id="rec-ovl" onclick="if(event.target===this)closeRec()">
-  <div class="modal" style="width:860px;max-width:98vw">
+  <div class="modal">
     <div class="mhead"><div class="mtitle" id="rec-title">Добавить</div><button class="mx" onclick="closeRec()">x</button></div>
     <div class="mbody" id="rec-body"></div>
     <div class="mfoot"><button class="btn btn-ghost" onclick="closeRec()">Отмена</button><button class="btn btn-primary" onclick="saveRec()">Сохранить</button></div>
@@ -299,7 +299,7 @@ var SECS = {
       {k:'stars',l:'Звёзды (1-5)',t:'num'},
       {k:'rooms',l:'Номера',t:'rooms'},
       {k:'rating',l:'Рейтинг',t:'num'},
-      {k:'room_photos',l:'Фото номеров',t:'room_photos'},
+      {k:'gallery',l:'Галерея',t:'gallery'},
       {k:'currency',l:'Валюта',t:'sel',o:['USD','EUR','UZS']},
       {k:'board_type',l:'Тип питания',t:'sel',o:['RO','BB','HB','FB','AI']},
       {k:'checkin_standard',l:'Check-in стандарт',t:'text',ph:'14:00'},
@@ -651,7 +651,63 @@ function renderCell(col, val) {
 }
 
 function goPage(p){ curPage=p; renderTable(); };
-function openAdd(){ editId=null; document.getElementById('rec-title').textContent='Добавить - '+SECS[curSec].label; buildForm(null); document.getElementById('rec-ovl').classList.add('open'); };
+function draftKey(){ return 'draft_'+curSec; }
+
+function saveDraft(){
+  if(editId) return; // черновик только для новых записей
+  var fields=SECS[curSec].fields||[]; var data={};
+  fields.forEach(function(f){
+    if(f.t==='rooms') data[f.k]=collectRooms();
+    else if(f.t==='gallery') data[f.k]=collectGallery();
+    else{ var el=document.getElementById('fi-'+f.k); if(el) data[f.k]=el.value; }
+  });
+  localStorage.setItem(draftKey(), JSON.stringify(data));
+}
+
+function loadDraft(){
+  try{ return JSON.parse(localStorage.getItem(draftKey())||'null'); }catch(e){ return null; }
+}
+
+function clearDraft(){ localStorage.removeItem(draftKey()); }
+
+function openAdd(){
+  editId=null;
+  var draft=loadDraft();
+  document.getElementById('rec-title').innerHTML='Добавить — '+SECS[curSec].label+
+    (draft?'<span id="draft-badge" style="margin-left:10px;font-size:11px;background:rgba(245,158,11,.15);color:var(--amb);border:1px solid rgba(245,158,11,.3);border-radius:5px;padding:2px 8px;font-weight:500;cursor:pointer" onclick="clearDraftAndReset()">✏ Черновик сохранён — нажми чтобы очистить</span>':'');
+  buildForm(draft);
+  document.getElementById('rec-ovl').classList.add('open');
+  // вешаем автосохранение на все поля
+  setTimeout(function(){
+    document.querySelectorAll('#rec-body input, #rec-body select, #rec-body textarea').forEach(function(el){
+      el.addEventListener('input', saveDraft);
+      el.addEventListener('change', saveDraft);
+    });
+    // наблюдатель за динамическими полями (номера/фото добавляются кнопкой)
+    var obs=new MutationObserver(function(){
+      document.querySelectorAll('#rec-body input, #rec-body select, #rec-body textarea').forEach(function(el){
+        if(!el._draftBound){ el._draftBound=true; el.addEventListener('input',saveDraft); el.addEventListener('change',saveDraft); }
+      });
+    });
+    var body=document.getElementById('rec-body');
+    if(body) obs.observe(body,{childList:true,subtree:true});
+  },100);
+}
+
+function clearDraftAndReset(){
+  clearDraft();
+  buildForm(null);
+  var badge=document.getElementById('draft-badge');
+  if(badge) badge.remove();
+  showToast('Черновик очищен','sky');
+  setTimeout(function(){
+    document.querySelectorAll('#rec-body input, #rec-body select, #rec-body textarea').forEach(function(el){
+      el.addEventListener('input', saveDraft);
+      el.addEventListener('change', saveDraft);
+    });
+  },100);
+}
+
 function openEdit(id){ editId=id; var rec=allRows.filter(function(r){return String(r.id)===String(id);})[0]; document.getElementById('rec-title').textContent='Редактировать'; buildForm(rec); document.getElementById('rec-ovl').classList.add('open'); };
 function closeRec(){ document.getElementById('rec-ovl').classList.remove('open'); editId=null; };
 
@@ -672,24 +728,19 @@ function buildForm(rec) {
       h+='</div>';
       return;
     }
-    if(f.t==='room_photos'){
-      var photosVal={};
-      try{ if(val) photosVal=typeof val==='string'?JSON.parse(val):val; }catch(e){}
-      h+='<div class="fg ffull"><label class="flabel">Фото номеров (по ID)</label>';
-      h+='<div style="display:flex;flex-direction:column;gap:8px">';
-      for(var pid=1;pid<=12;pid++){
-        var pval=photosVal[pid]||'';
-        h+='<div style="display:grid;grid-template-columns:36px 1fr auto auto;gap:6px;align-items:center">'+
-          '<span style="font-size:11px;font-weight:600;color:var(--acc2);background:var(--adim);border-radius:5px;padding:3px 6px;text-align:center">ID '+pid+'</span>'+
-          '<input class="fi" id="rph-'+pid+'" type="text" value="'+pval+'" placeholder="https://... (фото для номера ID '+pid+')" oninput="previewRoomPhoto('+pid+')">'+
-          '<button class="btn btn-ghost btn-sm" type="button" onclick="findRoomPhotos('+pid+')">Найти</button>'+
-          '<div style="width:48px;height:36px;border-radius:5px;overflow:hidden;background:var(--surf3);flex-shrink:0" id="rph-prev-'+pid+'">'+
-          (pval?'<img src="'+pval+'" style="width:100%;height:100%;object-fit:cover" onerror="this.style.opacity=0">':'')+
-          '</div>'+
-          '</div>'+
-          '<div id="rph-res-'+pid+'" style="padding-left:42px"></div>';
-      }
-      h+='</div></div>';
+    if(f.t==='gallery'){
+      var galleryVal=[];
+      try{ if(val) galleryVal=typeof val==='string'?JSON.parse(val):val; }catch(e){}
+      h+='<div class="fg ffull">';
+      h+='<label class="flabel">Галерея (до 50 фото, макс. 200 KB каждое)</label>';
+      h+='<div id="gallery-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px">';
+      if(Array.isArray(galleryVal)) galleryVal.forEach(function(url,i){ h+=buildGalleryThumb(i,url); });
+      h+='</div>';
+      h+='<label class="btn btn-ghost btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px">'+
+         '📁 Загрузить с диска'+
+         '<input type="file" accept="image/*" multiple style="display:none" onchange="handleGalleryUpload(event)"></label>'+
+         '<span id="gallery-count" style="font-size:11px;color:var(--tx3);margin-left:10px">'+(galleryVal.length||0)+'/50 фото</span>';
+      h+='</div>';
       return;
     }
     var full=(f.t==='ta'||f.t==='photo')?'ffull':'';
@@ -726,11 +777,10 @@ var ROOM_TYPES=[
 
 function buildRoomRow(i,r){
   var idOpts='';
-  for(var n=1;n<=12;n++) idOpts+='<option value="'+n+'"'+(+r.room_id===n?' selected':'')+'>'+n+'</option>';
-  var opts=ROOM_TYPES.map(function(t){return '<option'+(t===(r.type||'')?' selected':'')+'>'+t+'</option>';}).join('');
+  for(var n=1;n<=20;n++) idOpts+='<option value="'+n+'"'+(+r.room_id===n?' selected':'')+'>'+n+'</option>';
   return '<div class="room-row" id="room-row-'+i+'" style="grid-template-columns:60px 2fr 1fr 1fr 1fr auto">'+
     '<div><span class="flabel">ID фото</span><select class="fsel2" id="room-id-'+i+'">'+idOpts+'</select></div>'+
-    '<div><span class="flabel">Тип номера</span><select class="fsel2" id="room-type-'+i+'">'+opts+'</select></div>'+
+    '<div><span class="flabel">Тип номера</span><input class="fi" id="room-type-'+i+'" type="text" value="'+(r.type||'')+'" placeholder="Введите тип номера..."></div>'+
     '<div><span class="flabel">Цена ($)</span><input class="fi" id="room-price-'+i+'" type="number" value="'+(r.price||'')+'" placeholder="0"></div>'+
     '<div><span class="flabel">Сезон с</span><input class="fi" id="room-from-'+i+'" type="date" value="'+(r.date_from||'')+'"></div>'+
     '<div><span class="flabel">Сезон по</span><input class="fi" id="room-to-'+i+'" type="date" value="'+(r.date_to||'')+'"></div>'+
@@ -782,44 +832,61 @@ function collectRooms(){
   return rows;
 }
 
-function previewRoomPhoto(pid){
-  var inp=document.getElementById('rph-'+pid); if(!inp)return;
-  var p=document.getElementById('rph-prev-'+pid); if(!p)return;
-  p.innerHTML=inp.value?'<img src="'+inp.value+'" style="width:100%;height:100%;object-fit:cover" onerror="this.style.opacity=0">':'';
+// GALLERY
+var _galleryData = [];
+
+function buildGalleryThumb(i, url){
+  return '<div id="gth-'+i+'" style="position:relative;width:90px;height:68px;border-radius:6px;overflow:hidden;background:var(--surf3);flex-shrink:0">'+
+    '<img src="'+url+'" style="width:100%;height:100%;object-fit:cover">'+
+    '<button type="button" onclick="removeGalleryPhoto('+i+')" style="position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.7);color:#fff;border:none;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;padding:0">✕</button>'+
+    '</div>';
 }
 
-async function findRoomPhotos(pid){
-  var ne=document.getElementById('fi-name');
-  var ce=document.getElementById('fi-city');
-  var typeEl=document.querySelector('#rooms-list [id^="room-type-"]');
-  var q=[ne?ne.value:'',ce?ce.value:'',typeEl?typeEl.value:'hotel room','Uzbekistan'].filter(Boolean).join(' ');
-  var res=document.getElementById('rph-res-'+pid); if(!res)return;
-  res.innerHTML='<div class="uhint">Ищу фото...</div>';
-  try {
-    var r=await fetch('https://api.unsplash.com/search/photos?query='+encodeURIComponent(q)+'&per_page=6&client_id=x8nIR01NbCJlThbG9vyqcmUsFO6-EdQAPetNj04KID8');
-    var d=await r.json();
-    if(!d.results||!d.results.length){res.innerHTML='<div class="uhint">Не найдено</div>';return;}
-    res.innerHTML='<div class="ugrid">'+d.results.map(function(p){
-      var u=p.urls.regular.replace(/'/g,'%27');
-      return '<img class="uthumb" src="'+p.urls.small+'" onclick="pickRoomPhoto('+pid+',\''+u+'\')">';
-    }).join('')+'</div>';
-  }catch(e){res.innerHTML='<div class="uhint">Ошибка</div>';}
+function removeGalleryPhoto(i){
+  var el=document.getElementById('gth-'+i); if(el)el.remove();
+  updateGalleryCount();
+  saveDraft();
 }
 
-function pickRoomPhoto(pid,url){
-  var inp=document.getElementById('rph-'+pid); if(inp)inp.value=url;
-  var p=document.getElementById('rph-prev-'+pid);
-  if(p)p.innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover">';
-  var res=document.getElementById('rph-res-'+pid); if(res)res.innerHTML='';
+function updateGalleryCount(){
+  var grid=document.getElementById('gallery-grid'); if(!grid)return;
+  var cnt=grid.querySelectorAll('[id^="gth-"]').length;
+  var c=document.getElementById('gallery-count'); if(c)c.textContent=cnt+'/50 фото';
 }
 
-function collectRoomPhotos(){
-  var photos={};
-  for(var pid=1;pid<=12;pid++){
-    var inp=document.getElementById('rph-'+pid);
-    if(inp&&inp.value) photos[pid]=inp.value;
-  }
-  return photos;
+function handleGalleryUpload(e){
+  var files=Array.from(e.target.files);
+  var grid=document.getElementById('gallery-grid'); if(!grid)return;
+  var current=grid.querySelectorAll('[id^="gth-"]').length;
+  var allowed=50-current;
+  if(allowed<=0){showToast('Галерея заполнена (50 фото макс.)','red');return;}
+  var added=0; var errors=[];
+  files.slice(0,allowed).forEach(function(file){
+    if(file.size>200*1024){errors.push(file.name+' > 200 KB');return;}
+    if(!file.type.startsWith('image/')){return;}
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      // найти свободный индекс
+      var idx=0;
+      while(document.getElementById('gth-'+idx)) idx++;
+      var div=document.createElement('div');
+      div.innerHTML=buildGalleryThumb(idx, ev.target.result);
+      grid.appendChild(div.firstChild);
+      added++;
+      updateGalleryCount();
+      saveDraft();
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value='';
+  if(errors.length) setTimeout(function(){ showToast('Пропущено (>200KB): '+errors.join(', '),'red'); },500);
+}
+
+function collectGallery(){
+  var grid=document.getElementById('gallery-grid'); if(!grid)return[];
+  var urls=[];
+  grid.querySelectorAll('[id^="gth-"] img').forEach(function(img){ if(img.src) urls.push(img.src); });
+  return urls;
 }
 
 function previewPhoto(){
@@ -859,7 +926,7 @@ async function saveRec(){
   var fields=SECS[curSec].fields||[]; var body={};
   fields.forEach(function(f){
     if(f.t==='rooms'){ body[f.k]=JSON.stringify(collectRooms()); return; }
-    if(f.t==='room_photos'){ body[f.k]=JSON.stringify(collectRoomPhotos()); return; }
+    if(f.t==='gallery'){ body[f.k]=JSON.stringify(collectGallery()); return; }
     var el=document.getElementById('fi-'+f.k); if(!el)return;
     var v=el.value;
     if(f.t==='num') v=v===''?null:+v;
@@ -876,7 +943,7 @@ async function saveRec(){
       resp=await sbFetch(curSec,{method:'POST',body:body});
       showToast('Добавлено','green');
     }
-    closeRec(); loadData();
+    closeRec(); clearDraft(); loadData();
   } catch(e){
     var msg=e.message||'Неизвестная ошибка';
     if(msg.toLowerCase().indexOf('failed to fetch')>-1){
