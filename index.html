@@ -868,8 +868,10 @@ async function supabaseRequest(table, options = {}) {
     'apikey': SUPABASE_KEY,
     'Authorization': `Bearer ${SUPABASE_KEY}`,
     'Content-Type': 'application/json',
-    'Prefer': method === 'POST' ? 'return=representation' : 'return=minimal'
+    'Prefer': method === 'POST' ? 'return=representation' : (method === 'PATCH' ? 'return=representation' : 'return=minimal')
   };
+  
+  console.log(`[Supabase] ${method} ${table}${query}`);
   
   try {
     const response = await fetch(url, {
@@ -878,17 +880,24 @@ async function supabaseRequest(table, options = {}) {
       body: body ? JSON.stringify(body) : undefined
     });
     
+    const responseText = await response.text();
+    console.log(`[Supabase] Response: ${response.status}`, responseText.substring(0, 200));
+    
     if (!response.ok) {
-      const error = await response.text();
-      throw new Error(error);
+      throw new Error(`${response.status}: ${responseText}`);
     }
     
-    if (method === 'GET' || method === 'POST') {
-      return await response.json();
+    if (method === 'GET' || method === 'POST' || method === 'PATCH') {
+      try {
+        return responseText ? JSON.parse(responseText) : [];
+      } catch(e) {
+        console.warn('[Supabase] Empty or invalid JSON response');
+        return [];
+      }
     }
     return true;
   } catch (error) {
-    console.error('Supabase error:', error);
+    console.error('[Supabase] Error:', error);
     throw error;
   }
 }
@@ -1014,22 +1023,40 @@ async function loadSectionData() {
     <tr><td colspan="${cfg.columns.length + 1}">
       <div class="loading">
         <div class="spinner"></div>
-        Загрузка...
+        Загрузка из Supabase...
       </div>
     </td></tr>`;
   
   try {
+    console.log('[Load] Loading section:', currentSection);
     allData = await supabaseRequest(currentSection, { query: '?order=created_at.desc' });
-    document.getElementById('cnt-' + currentSection).textContent = allData.length;
+    console.log('[Load] Loaded records:', allData.length);
+    
+    if (!Array.isArray(allData)) {
+      console.warn('[Load] Response is not an array, using empty array');
+      allData = [];
+    }
+    
+    const cntEl = document.getElementById('cnt-' + currentSection);
+    if (cntEl) cntEl.textContent = allData.length;
+    
     updateStats();
     filterData();
     document.getElementById('tableStatus').textContent = '✓ Синхронизировано';
   } catch (error) {
+    console.error('[Load] Error:', error);
     document.getElementById('tableBody').innerHTML = `
       <tr><td colspan="${cfg.columns.length + 1}">
         <div class="empty">
           <div class="empty-icon">⚠️</div>
-          <p>Ошибка: ${error.message}</p>
+          <p>Ошибка загрузки</p>
+          <p style="font-size:12px;color:var(--tx3)">${error.message}</p>
+          <p style="font-size:11px;color:var(--tx3);margin-top:10px">
+            Проверьте:<br>
+            1. Таблица "${currentSection}" существует в Supabase<br>
+            2. RLS политики настроены правильно<br>
+            3. API ключ верный
+          </p>
         </div>
       </td></tr>`;
     document.getElementById('tableStatus').textContent = '❌ Ошибка';
