@@ -18,14 +18,19 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--ff)
 
 /* Login */
 #lock{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999}
-.lcard{background:var(--surf);border:1px solid var(--b2);border-radius:20px;padding:48px 40px;width:360px;text-align:center}
+.lcard{background:var(--surf);border:1px solid var(--b2);border-radius:20px;padding:48px 40px;width:400px;text-align:center}
 .llogo{width:56px;height:56px;background:var(--acc);border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:22px;color:#fff;margin:0 auto 18px}
 .ltitle{font-size:20px;font-weight:600;margin-bottom:5px}
 .lsub{font-size:13px;color:var(--tx3);margin-bottom:26px}
-.linput{width:100%;background:var(--surf2);border:1px solid var(--b);border-radius:10px;padding:12px 16px;color:var(--tx);font-size:15px;font-family:var(--ff);outline:none;text-align:center;letter-spacing:4px}
+.linput{width:100%;background:var(--surf2);border:1px solid var(--b);border-radius:10px;padding:12px 16px;color:var(--tx);font-size:14px;font-family:var(--ff);outline:none;margin-bottom:10px;text-align:left}
 .linput:focus{border-color:var(--acc)}
-.lbtn{width:100%;margin-top:12px;padding:13px;background:var(--acc);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;font-family:var(--ff)}
-.lerr{font-size:12px;color:var(--red);margin-top:8px;opacity:0;transition:opacity .3s}
+.linput::placeholder{color:var(--tx3)}
+.lbtn{width:100%;margin-top:8px;padding:13px;background:var(--acc);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;font-family:var(--ff)}
+.lbtn:disabled{opacity:0.5;cursor:not-allowed}
+.lerr{font-size:12px;color:var(--red);margin-top:10px;min-height:18px}
+.lsuccess{font-size:12px;color:var(--grn);margin-top:10px}
+.lhelp{font-size:11px;color:var(--tx3);margin-top:16px;line-height:1.5}
+.lhelp a{color:var(--sky)}
 
 /* Layout */
 #app{display:none;height:100vh;overflow:hidden}
@@ -46,7 +51,7 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--ff)
 .logout-btn{width:100%;margin-bottom:8px;padding:8px;background:rgba(239,68,68,.08);color:var(--red);border:1px solid rgba(239,68,68,.15);border-radius:8px;font-family:var(--ff);font-size:12px;cursor:pointer}
 .conn{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surf2);border-radius:8px;font-size:12px;color:var(--tx2)}
 .cdot{width:7px;height:7px;border-radius:50%;background:var(--grn);box-shadow:0 0 6px var(--grn)}
-.cdot.off{background:var(--tx3);box-shadow:none}
+.cdot.off{background:var(--red);box-shadow:0 0 6px var(--red)}
 
 /* Main Area */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
@@ -76,6 +81,7 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--ff)
 .btn-ghost{background:var(--surf2);color:var(--tx2);border-color:var(--b)}
 .btn-ghost:hover{background:var(--surf3);color:var(--tx)}
 .btn-sm{padding:6px 12px;font-size:12px}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
 
 /* Table */
 .table-wrap{background:var(--surf);border:1px solid var(--b);border-radius:12px;overflow:hidden}
@@ -99,6 +105,11 @@ td.primary{color:var(--tx);font-weight:500}
 .table-foot{padding:12px 14px;border-top:1px solid var(--b);background:var(--surf2);display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--tx3)}
 .empty{text-align:center;padding:50px;color:var(--tx3)}
 .empty-icon{font-size:40px;margin-bottom:12px}
+
+/* Loading */
+.loading{text-align:center;padding:40px;color:var(--tx3)}
+.spinner{width:32px;height:32px;border:3px solid var(--b);border-top-color:var(--acc);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 /* Modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
@@ -167,11 +178,6 @@ td.primary{color:var(--tx);font-weight:500}
 .modules-total-label{font-weight:600;color:var(--tx)}
 .modules-total-value{font-size:28px;font-weight:700;color:var(--grn);font-family:var(--fm)}
 
-/* Toast */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--surf);border:1px solid var(--b2);border-radius:10px;padding:12px 18px;font-size:13px;display:flex;align-items:center;gap:10px;transform:translateY(80px);opacity:0;transition:all .3s;z-index:3000}
-.toast.show{transform:translateY(0);opacity:1}
-.toast-dot{width:8px;height:8px;border-radius:50%}
-
 /* Rooms & Gallery */
 .room-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;align-items:end;background:var(--surf2);border:1px solid var(--b);border-radius:8px;padding:12px;margin-bottom:8px}
 .room-row .room-label{font-size:9px;font-weight:600;color:var(--tx3);letter-spacing:.5px;text-transform:uppercase;display:block;margin-bottom:4px}
@@ -182,20 +188,36 @@ td.primary{color:var(--tx);font-weight:500}
 .gallery-thumb img{width:100%;height:100%;object-fit:cover}
 .gallery-thumb .remove-btn{position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.7);color:#fff;border:none;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center}
 .gallery-thumb .remove-btn:hover{background:var(--red)}
-.form-textarea{min-height:80px;resize:vertical}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surf);border:1px solid var(--b2);border-radius:10px;padding:12px 18px;font-size:13px;display:flex;align-items:center;gap:10px;transform:translateY(80px);opacity:0;transition:all .3s;z-index:3000}
+.toast.show{transform:translateY(0);opacity:1}
+.toast-dot{width:8px;height:8px;border-radius:50%}
 </style>
 </head>
 <body>
 
-<!-- Login Screen -->
+<!-- Login / Setup Screen -->
 <div id="lock">
   <div class="lcard">
     <div class="llogo">W</div>
     <div class="ltitle">Waylo Admin</div>
-    <div class="lsub">Введите пароль для входа</div>
-    <input class="linput" id="loginPassword" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()">
-    <button class="lbtn" onclick="login()">Войти</button>
-    <div class="lerr" id="loginError">Неверный пароль</div>
+    <div class="lsub">Подключение к Supabase</div>
+    
+    <input class="linput" id="inputUrl" type="text" placeholder="Project URL (https://xxx.supabase.co)">
+    <input class="linput" id="inputKey" type="text" placeholder="anon public key (eyJhbGci...)">
+    <input class="linput" id="inputPassword" type="password" placeholder="Пароль админки">
+    
+    <button class="lbtn" id="connectBtn" onclick="connectSupabase()">Подключиться</button>
+    
+    <div class="lerr" id="loginError"></div>
+    <div class="lsuccess" id="loginSuccess"></div>
+    
+    <div class="lhelp">
+      Где взять данные?<br>
+      Supabase → Settings → API<br>
+      <a href="https://supabase.com/dashboard" target="_blank">Открыть Supabase Dashboard</a>
+    </div>
   </div>
 </div>
 
@@ -264,10 +286,10 @@ td.primary{color:var(--tx);font-weight:500}
     </div>
     
     <div class="sb-foot">
-      <button class="logout-btn" onclick="logout()">Выйти</button>
+      <button class="logout-btn" onclick="logout()">Отключиться</button>
       <div class="conn">
         <div class="cdot" id="connDot"></div>
-        <span id="connLabel">Демо-режим</span>
+        <span id="connLabel">Не подключено</span>
       </div>
     </div>
   </div>
@@ -318,6 +340,7 @@ td.primary{color:var(--tx);font-weight:500}
           <option value="approved">Approved</option>
           <option value="pending">Ожидает</option>
         </select>
+        <button class="btn btn-ghost" onclick="loadSectionData()">🔄 Обновить</button>
       </div>
       
       <!-- Table -->
@@ -328,6 +351,7 @@ td.primary{color:var(--tx);font-weight:500}
         </table>
         <div class="table-foot">
           <span id="tableCount">0 записей</span>
+          <span id="tableStatus"></span>
         </div>
       </div>
     </div>
@@ -345,7 +369,7 @@ td.primary{color:var(--tx);font-weight:500}
     <div class="modal-body" id="modalBody"></div>
     <div class="modal-foot">
       <button class="btn btn-ghost" onclick="closeModal()">Отмена</button>
-      <button class="btn btn-primary" onclick="saveRecord()">Сохранить</button>
+      <button class="btn btn-primary" id="saveBtn" onclick="saveRecord()">Сохранить</button>
     </div>
   </div>
 </div>
@@ -358,9 +382,11 @@ td.primary{color:var(--tx);font-weight:500}
 
 <script>
 // ============================================
-// КОНФИГУРАЦИЯ
+// КОНФИГУРАЦИЯ SUPABASE
 // ============================================
-const PASSWORD = 'w2';
+let SUPABASE_URL = '';
+let SUPABASE_KEY = '';
+const ADMIN_PASSWORD = 'w2'; // Пароль для входа в админку
 
 // Иконки и названия модулей
 const MODULE_TYPES = {
@@ -425,10 +451,41 @@ const SECTIONS = {
       { key: 'gallery', label: 'Галерея', type: 'gallery' },
       { key: 'currency', label: 'Валюта', type: 'select', options: ['USD', 'EUR', 'UZS'] },
       { key: 'board_type', label: 'Тип питания', type: 'select', options: ['RO', 'BB', 'HB', 'FB', 'AI'] },
-      { key: 'checkin_standard', label: 'Check-in стандарт', type: 'text', placeholder: '14:00' },
-      { key: 'checkout_standard', label: 'Check-out стандарт', type: 'text', placeholder: '12:00' },
-      { key: 'amenities', label: 'Удобства', type: 'text', placeholder: 'Wi-Fi, бассейн, спа, ресторан' },
-      { key: 'hotel_rules', label: 'Правила отеля', type: 'textarea', placeholder: 'Введите правила отеля...' },
+      { key: 'checkin_standard', label: 'Check-in', type: 'text', placeholder: '14:00' },
+      { key: 'checkout_standard', label: 'Check-out', type: 'text', placeholder: '12:00' },
+      { key: 'amenities', label: 'Удобства', type: 'text', placeholder: 'Wi-Fi, бассейн, спа' },
+      { key: 'hotel_rules', label: 'Правила', type: 'textarea' },
+      { key: 'active', label: 'Активен', type: 'boolean' }
+    ]
+  },
+  flights: {
+    title: 'Авиабилеты',
+    badge: 'Каталог',
+    priceField: 'price',
+    columns: ['route', 'airline', 'departure', 'price', 'active'],
+    columnLabels: { route: 'Маршрут', airline: 'Авиакомпания', departure: 'Вылет', price: 'Цена', active: 'Статус' },
+    fields: [
+      { key: 'route', label: 'Маршрут', type: 'text', required: true, placeholder: 'Ташкент → Самарканд' },
+      { key: 'airline', label: 'Авиакомпания', type: 'select', options: ['Uzbekistan Airways', 'Qanot Sharq', 'Silk Avia'] },
+      { key: 'departure', label: 'Время вылета', type: 'text', placeholder: '08:30' },
+      { key: 'duration', label: 'Время в пути', type: 'text', placeholder: '1ч 10м' },
+      { key: 'price', label: 'Цена ($)', type: 'number' },
+      { key: 'active', label: 'Активен', type: 'boolean' }
+    ]
+  },
+  transfers: {
+    title: 'Трансферы',
+    badge: 'Каталог',
+    priceField: 'price',
+    columns: ['name', 'from_city', 'to_city', 'vehicle', 'price', 'active'],
+    columnLabels: { name: 'Маршрут', from_city: 'Откуда', to_city: 'Куда', vehicle: 'Транспорт', price: 'Цена', active: 'Статус' },
+    fields: [
+      { key: 'name', label: 'Название', type: 'text', required: true },
+      { key: 'from_city', label: 'Откуда', type: 'city' },
+      { key: 'to_city', label: 'Куда', type: 'city' },
+      { key: 'vehicle', label: 'Транспорт', type: 'select', options: ['седан', 'минивэн', 'автобус', 'поезд'] },
+      { key: 'price', label: 'Цена ($)', type: 'number' },
+      { key: 'duration_hours', label: 'Часов в пути', type: 'number' },
       { key: 'active', label: 'Активен', type: 'boolean' }
     ]
   },
@@ -464,70 +521,6 @@ const SECTIONS = {
       { key: 'active', label: 'Активен', type: 'boolean' }
     ]
   },
-  museums: {
-    title: 'Музеи',
-    badge: 'Каталог',
-    priceField: 'entry_price',
-    columns: ['image_url', 'name', 'city', 'type', 'entry_price', 'active'],
-    columnLabels: { image_url: '', name: 'Название', city: 'Город', type: 'Тип', entry_price: 'Вход', active: 'Статус' },
-    fields: [
-      { key: 'name', label: 'Название', type: 'text', required: true },
-      { key: 'image_url', label: 'Фото', type: 'photo' },
-      { key: 'city', label: 'Город', type: 'city' },
-      { key: 'type', label: 'Тип', type: 'select', options: ['исторический', 'художественный', 'краеведческий'] },
-      { key: 'entry_price', label: 'Цена входа ($)', type: 'number' },
-      { key: 'rating', label: 'Рейтинг', type: 'number' },
-      { key: 'active', label: 'Активен', type: 'boolean' }
-    ]
-  },
-  transfers: {
-    title: 'Трансферы',
-    badge: 'Каталог',
-    priceField: 'price',
-    columns: ['name', 'from_city', 'to_city', 'vehicle', 'price', 'active'],
-    columnLabels: { name: 'Маршрут', from_city: 'Откуда', to_city: 'Куда', vehicle: 'Транспорт', price: 'Цена', active: 'Статус' },
-    fields: [
-      { key: 'name', label: 'Название маршрута', type: 'text', required: true },
-      { key: 'from_city', label: 'Откуда', type: 'city' },
-      { key: 'to_city', label: 'Куда', type: 'city' },
-      { key: 'vehicle', label: 'Транспорт', type: 'select', options: ['седан', 'минивэн', 'автобус', 'поезд'] },
-      { key: 'price', label: 'Цена ($)', type: 'number' },
-      { key: 'duration_hours', label: 'Часов в пути', type: 'number' },
-      { key: 'active', label: 'Активен', type: 'boolean' }
-    ]
-  },
-  guides: {
-    title: 'Гиды',
-    badge: 'Каталог',
-    priceField: 'price_day',
-    columns: ['image_url', 'name', 'city', 'languages', 'price_day', 'active'],
-    columnLabels: { image_url: '', name: 'Имя', city: 'Город', languages: 'Языки', price_day: 'Цена/день', active: 'Статус' },
-    fields: [
-      { key: 'name', label: 'Имя', type: 'text', required: true },
-      { key: 'image_url', label: 'Фото', type: 'photo' },
-      { key: 'city', label: 'Город', type: 'city' },
-      { key: 'languages', label: 'Языки', type: 'text', placeholder: 'русский, английский' },
-      { key: 'price_day', label: 'Цена за день ($)', type: 'number' },
-      { key: 'rating', label: 'Рейтинг', type: 'number' },
-      { key: 'experience_years', label: 'Опыт (лет)', type: 'number' },
-      { key: 'active', label: 'Активен', type: 'boolean' }
-    ]
-  },
-  flights: {
-    title: 'Авиабилеты',
-    badge: 'Каталог',
-    priceField: 'price',
-    columns: ['route', 'airline', 'departure', 'price', 'active'],
-    columnLabels: { route: 'Маршрут', airline: 'Авиакомпания', departure: 'Вылет', price: 'Цена', active: 'Статус' },
-    fields: [
-      { key: 'route', label: 'Маршрут', type: 'text', required: true, placeholder: 'Ташкент → Самарканд' },
-      { key: 'airline', label: 'Авиакомпания', type: 'select', options: ['Uzbekistan Airways', 'Qanot Sharq', 'Silk Avia'] },
-      { key: 'departure', label: 'Время вылета', type: 'text', placeholder: '08:30' },
-      { key: 'duration', label: 'Время в пути', type: 'text', placeholder: '1ч 10м' },
-      { key: 'price', label: 'Цена ($)', type: 'number' },
-      { key: 'active', label: 'Активен', type: 'boolean' }
-    ]
-  },
   food: {
     title: 'Еда',
     badge: 'Каталог',
@@ -554,7 +547,7 @@ const SECTIONS = {
       { key: 'name', label: 'Название', type: 'text', required: true },
       { key: 'image_url', label: 'Фото', type: 'photo' },
       { key: 'city', label: 'Город', type: 'city' },
-      { key: 'type', label: 'Тип', type: 'select', options: ['хаммам', 'SPA', 'массаж', 'бассейн', 'йога', 'медитация'] },
+      { key: 'type', label: 'Тип', type: 'select', options: ['хаммам', 'SPA', 'массаж', 'бассейн', 'йога'] },
       { key: 'price', label: 'Цена ($)', type: 'number' },
       { key: 'duration_hours', label: 'Часов', type: 'number' },
       { key: 'rating', label: 'Рейтинг', type: 'number' },
@@ -571,325 +564,182 @@ const SECTIONS = {
       { key: 'name', label: 'Название', type: 'text', required: true },
       { key: 'image_url', label: 'Фото', type: 'photo' },
       { key: 'city', label: 'Город', type: 'city' },
-      { key: 'type', label: 'Тип', type: 'select', options: ['шоу', 'концерт', 'театр', 'танцы', 'мастер-класс', 'фестиваль'] },
+      { key: 'type', label: 'Тип', type: 'select', options: ['шоу', 'концерт', 'театр', 'танцы', 'мастер-класс'] },
       { key: 'price', label: 'Цена ($)', type: 'number' },
       { key: 'time', label: 'Время', type: 'text', placeholder: '19:00' },
       { key: 'rating', label: 'Рейтинг', type: 'number' },
+      { key: 'active', label: 'Активен', type: 'boolean' }
+    ]
+  },
+  museums: {
+    title: 'Музеи',
+    badge: 'Каталог',
+    priceField: 'entry_price',
+    columns: ['image_url', 'name', 'city', 'type', 'entry_price', 'active'],
+    columnLabels: { image_url: '', name: 'Название', city: 'Город', type: 'Тип', entry_price: 'Вход', active: 'Статус' },
+    fields: [
+      { key: 'name', label: 'Название', type: 'text', required: true },
+      { key: 'image_url', label: 'Фото', type: 'photo' },
+      { key: 'city', label: 'Город', type: 'city' },
+      { key: 'type', label: 'Тип', type: 'select', options: ['исторический', 'художественный', 'краеведческий'] },
+      { key: 'entry_price', label: 'Цена входа ($)', type: 'number' },
+      { key: 'rating', label: 'Рейтинг', type: 'number' },
+      { key: 'active', label: 'Активен', type: 'boolean' }
+    ]
+  },
+  guides: {
+    title: 'Гиды',
+    badge: 'Каталог',
+    priceField: 'price_day',
+    columns: ['image_url', 'name', 'city', 'languages', 'price_day', 'active'],
+    columnLabels: { image_url: '', name: 'Имя', city: 'Город', languages: 'Языки', price_day: 'Цена/день', active: 'Статус' },
+    fields: [
+      { key: 'name', label: 'Имя', type: 'text', required: true },
+      { key: 'image_url', label: 'Фото', type: 'photo' },
+      { key: 'city', label: 'Город', type: 'city' },
+      { key: 'languages', label: 'Языки', type: 'text', placeholder: 'русский, английский' },
+      { key: 'price_day', label: 'Цена за день ($)', type: 'number' },
+      { key: 'rating', label: 'Рейтинг', type: 'number' },
+      { key: 'experience_years', label: 'Опыт (лет)', type: 'number' },
       { key: 'active', label: 'Активен', type: 'boolean' }
     ]
   }
 };
 
 // ============================================
-// ДЕМО-ДАННЫЕ ДЛЯ КАТАЛОГА
-// ============================================
-const DEMO_DATA = {
-  hotels: [
-    { 
-      id: 'h1', 
-      name: 'Hyatt Regency Tashkent', 
-      city: 'Ташкент', 
-      stars: '5', 
-      price_from: 180, 
-      rating: 9.2, 
-      address: 'ул. Навои, 1А',
-      board_type: 'BB',
-      currency: 'USD',
-      checkin_standard: '14:00',
-      checkout_standard: '12:00',
-      amenities: 'Wi-Fi, бассейн, спа, ресторан, фитнес',
-      rooms: [
-        { type: 'Standard Double', price: 180, date_from: '2025-01-01', date_to: '2025-04-30' },
-        { type: 'Standard Double', price: 220, date_from: '2025-05-01', date_to: '2025-09-30' },
-        { type: 'Executive Suite', price: 350, date_from: '2025-01-01', date_to: '2025-12-31' },
-        { type: 'Presidential Suite', price: 800, date_from: '2025-01-01', date_to: '2025-12-31' }
-      ],
-      gallery: [
-        'https://cf.bstatic.com/xdata/images/hotel/max1024x768/261636498.jpg',
-        'https://cf.bstatic.com/xdata/images/hotel/max1024x768/261636525.jpg'
-      ],
-      active: true 
-    },
-    { 
-      id: 'h2', 
-      name: 'Hotel & SPA Naqshband', 
-      city: 'Бухара', 
-      stars: '4', 
-      price_from: 85, 
-      rating: 8.9, 
-      address: 'ул. Накшбанди, 15',
-      board_type: 'HB',
-      currency: 'USD',
-      checkin_standard: '14:00',
-      checkout_standard: '12:00',
-      amenities: 'Wi-Fi, хаммам, спа, ресторан',
-      rooms: [
-        { type: 'Standard Single', price: 85, date_from: '2025-01-01', date_to: '2025-12-31' },
-        { type: 'Standard Double', price: 120, date_from: '2025-01-01', date_to: '2025-12-31' },
-        { type: 'Suite', price: 200, date_from: '2025-01-01', date_to: '2025-12-31' }
-      ],
-      gallery: [
-        'https://cf.bstatic.com/xdata/images/hotel/max1024x768/226196451.jpg'
-      ],
-      active: true 
-    },
-    { 
-      id: 'h3', 
-      name: 'Silk Road Samarkand', 
-      city: 'Самарканд', 
-      stars: '5', 
-      price_from: 220, 
-      rating: 9.5, 
-      address: 'ул. Университетская, 1',
-      board_type: 'BB',
-      currency: 'USD',
-      checkin_standard: '15:00',
-      checkout_standard: '12:00',
-      amenities: 'Wi-Fi, бассейн, спа, 5 ресторанов, гольф',
-      rooms: [
-        { type: 'Deluxe Room', price: 220, date_from: '2025-01-01', date_to: '2025-04-30' },
-        { type: 'Deluxe Room', price: 280, date_from: '2025-05-01', date_to: '2025-09-30' },
-        { type: 'Executive Suite', price: 450, date_from: '2025-01-01', date_to: '2025-12-31' },
-        { type: 'Royal Suite', price: 1200, date_from: '2025-01-01', date_to: '2025-12-31' }
-      ],
-      gallery: [
-        'https://silkroad-samarkand.com/upload/iblock/d37/bttdh0z84gwigwgxp3vc3e0tlcmjw3xf.jpg'
-      ],
-      active: true 
-    },
-    { 
-      id: 'h4', 
-      name: 'Ichan Qala Hotel', 
-      city: 'Хива', 
-      stars: '4', 
-      price_from: 65, 
-      rating: 8.7, 
-      address: 'Ичан-Кала, ул. Пахлавон Махмуд',
-      board_type: 'BB',
-      currency: 'USD',
-      checkin_standard: '14:00',
-      checkout_standard: '11:00',
-      amenities: 'Wi-Fi, ресторан, терраса с видом',
-      rooms: [
-        { type: 'Standard Room', price: 65, date_from: '2025-01-01', date_to: '2025-12-31' },
-        { type: 'Superior Room', price: 95, date_from: '2025-01-01', date_to: '2025-12-31' }
-      ],
-      gallery: [
-        'https://cf.bstatic.com/xdata/images/hotel/max1024x768/104893359.jpg'
-      ],
-      active: true 
-    }
-  ],
-  sights: [
-    { id: 's1', name: 'Площадь Регистан', city: 'Самарканд', type: 'UNESCO', entry_price: 8, rating: 9.8, image_url: 'https://uzbekistan.travel/storage/app/media/uploaded-files/1440x810-4.jpg', active: true },
-    { id: 's2', name: 'Комплекс Шахи-Зинда', city: 'Самарканд', type: 'мавзолей', entry_price: 5, rating: 9.6, image_url: 'https://uzbekistan.travel/storage/app/media/nuzratilla/shah-i-zinda.jpg', active: true },
-    { id: 's3', name: 'Мечеть Биби-Ханым', city: 'Самарканд', type: 'мечеть', entry_price: 4, rating: 9.3, image_url: 'https://uzbekistan.travel/storage/app/media/uploaded-files/1440x810-8.jpg', active: true },
-    { id: 's4', name: 'Ляби-хауз', city: 'Бухара', type: 'площадь', entry_price: 0, rating: 9.4, image_url: 'https://uzbekistan.travel/storage/app/media/nuzratilla/cropped-images/lyabi-house-1-0-0-0-0-1583389188.jpg', active: true },
-    { id: 's5', name: 'Крепость Арк', city: 'Бухара', type: 'крепость', entry_price: 6, rating: 9.1, image_url: 'https://uzbekistan.travel/storage/app/media/nuzratilla/ark-qalasi-2.jpg', active: true },
-    { id: 's6', name: 'Минарет Калян', city: 'Бухара', type: 'UNESCO', entry_price: 3, rating: 9.5, image_url: 'https://uzbekistan.travel/storage/app/media/nuzratilla/minaret-kalon.jpg', active: true },
-    { id: 's7', name: 'Ичан-Кала', city: 'Хива', type: 'UNESCO', entry_price: 10, rating: 9.7, image_url: 'https://uzbekistan.travel/storage/app/media/uploaded-files/khiva-1440x810.jpg', active: true },
-    { id: 's8', name: 'Комплекс Хазрати Имам', city: 'Ташкент', type: 'мечеть', entry_price: 0, rating: 9.0, image_url: 'https://uzbekistan.travel/storage/app/media/uploaded-files/1440x810-13.jpg', active: true }
-  ],
-  restaurants: [
-    { id: 'r1', name: 'Центр плова', city: 'Ташкент', cuisine: 'узбекская', avg_check: 8, rating: 9.3, image_url: 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0f/5c/f2/20/osh-markazi.jpg', active: true },
-    { id: 'r2', name: 'Ресторан Lyabi House', city: 'Бухара', cuisine: 'узбекская', avg_check: 15, rating: 8.9, image_url: 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/15/e8/1d/e1/photo0jpg.jpg', active: true },
-    { id: 'r3', name: 'Platan', city: 'Самарканд', cuisine: 'узбекская', avg_check: 12, rating: 9.0, image_url: 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/b5/cd/21/caption.jpg', active: true },
-    { id: 'r4', name: 'The Terrace', city: 'Хива', cuisine: 'смешанная', avg_check: 18, rating: 8.7, image_url: 'https://cf.bstatic.com/xdata/images/hotel/max1024x768/227855447.jpg', active: true }
-  ],
-  museums: [
-    { id: 'm1', name: 'Музей Улугбека', city: 'Самарканд', type: 'исторический', entry_price: 4, rating: 9.2, image_url: 'https://uzbekistan.travel/storage/app/media/nuzratilla/ulugbek-rasadxonasi-2.jpg', active: true },
-    { id: 'm2', name: 'Музей истории Узбекистана', city: 'Ташкент', type: 'исторический', entry_price: 3, rating: 8.8, image_url: 'https://uzbekistan.travel/storage/app/media/History%20museum.jpg', active: true },
-    { id: 'm3', name: 'Музей Афрасиаб', city: 'Самарканд', type: 'краеведческий', entry_price: 3, rating: 8.6, image_url: 'https://uzbekistan.travel/storage/app/media/nuzratilla/afrosiyob-muzeyi.jpg', active: true }
-  ],
-  transfers: [
-    { id: 't1', name: 'Аэропорт Ташкент → Центр', from_city: 'Ташкент', to_city: 'Ташкент', vehicle: 'седан', price: 15, duration_hours: 0.5, active: true },
-    { id: 't2', name: 'Ташкент → Самарканд', from_city: 'Ташкент', to_city: 'Самарканд', vehicle: 'поезд', price: 25, duration_hours: 2, active: true },
-    { id: 't3', name: 'Самарканд → Бухара', from_city: 'Самарканд', to_city: 'Бухара', vehicle: 'поезд', price: 20, duration_hours: 1.5, active: true },
-    { id: 't4', name: 'Бухара → Хива', from_city: 'Бухара', to_city: 'Хива', vehicle: 'минивэн', price: 80, duration_hours: 5, active: true }
-  ],
-  guides: [
-    { id: 'g1', name: 'Тимур Каримов', city: 'Самарканд', languages: 'русский, английский, немецкий', price_day: 50, rating: 9.6, experience_years: 12, image_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200', active: true },
-    { id: 'g2', name: 'Лола Азимова', city: 'Бухара', languages: 'русский, английский, французский', price_day: 45, rating: 9.4, experience_years: 8, image_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200', active: true },
-    { id: 'g3', name: 'Алишер Рахимов', city: 'Хива', languages: 'русский, английский', price_day: 40, rating: 9.2, experience_years: 6, image_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200', active: true }
-  ],
-  flights: [
-    { id: 'fl1', route: 'Ташкент → Самарканд', airline: 'Uzbekistan Airways', departure: '08:30', duration: '1ч 10м', price: 65, active: true },
-    { id: 'fl2', route: 'Ташкент → Бухара', airline: 'Uzbekistan Airways', departure: '07:15', duration: '1ч 25м', price: 89, active: true },
-    { id: 'fl3', route: 'Ташкент → Ургенч (Хива)', airline: 'Uzbekistan Airways', departure: '09:00', duration: '1ч 45м', price: 110, active: true },
-    { id: 'fl4', route: 'Самарканд → Бухара', airline: 'Qanot Sharq', departure: '11:30', duration: '45м', price: 55, active: true }
-  ],
-  food: [
-    { id: 'fd1', name: 'Плов по-самаркандски', city: 'Самарканд', type: 'плов', price: 8, rating: 9.5, image_url: 'https://uzbekistan.travel/storage/app/media/nuzratilla/osh-palov.jpg', active: true },
-    { id: 'fd2', name: 'Шашлык из баранины', city: 'Ташкент', type: 'шашлык', price: 12, rating: 9.2, image_url: 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/b5/d0/21/caption.jpg', active: true },
-    { id: 'fd3', name: 'Лагман домашний', city: 'Бухара', type: 'лагман', price: 6, rating: 9.0, image_url: 'https://uzbekistan.travel/storage/app/media/nuzratilla/lagmon.jpg', active: true },
-    { id: 'fd4', name: 'Дегустация 5 блюд', city: 'Самарканд', type: 'дегустация', price: 25, rating: 9.4, image_url: 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/b5/cd/21/caption.jpg', active: true },
-    { id: 'fd5', name: 'Самса тандырная', city: 'Бухара', type: 'самса', price: 3, rating: 9.3, image_url: 'https://uzbekistan.travel/storage/app/media/nuzratilla/somsa.jpg', active: true }
-  ],
-  recreation: [
-    { id: 'rec1', name: 'Хаммам традиционный', city: 'Бухара', type: 'хаммам', price: 35, duration_hours: 2, rating: 9.3, image_url: 'https://cf.bstatic.com/xdata/images/hotel/max1024x768/227855800.jpg', active: true },
-    { id: 'rec2', name: 'SPA Silk Road', city: 'Самарканд', type: 'SPA', price: 60, duration_hours: 3, rating: 9.5, image_url: 'https://silkroad-samarkand.com/upload/iblock/d37/spa-relax.jpg', active: true },
-    { id: 'rec3', name: 'Массаж восточный', city: 'Ташкент', type: 'массаж', price: 40, duration_hours: 1.5, rating: 9.1, image_url: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400', active: true },
-    { id: 'rec4', name: 'Йога на рассвете', city: 'Хива', type: 'йога', price: 20, duration_hours: 1.5, rating: 8.9, image_url: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400', active: true }
-  ],
-  entertainment: [
-    { id: 'ent1', name: 'Шоу узбекских танцев', city: 'Самарканд', type: 'шоу', price: 25, time: '20:00', rating: 9.4, image_url: 'https://uzbekistan.travel/storage/app/media/nuzratilla/lazgi-dance.jpg', active: true },
-    { id: 'ent2', name: 'Концерт макома', city: 'Бухара', type: 'концерт', price: 30, time: '19:30', rating: 9.2, image_url: 'https://uzbekistan.travel/storage/app/media/nuzratilla/shash-maqom.jpg', active: true },
-    { id: 'ent3', name: 'Мастер-класс керамики', city: 'Самарканд', type: 'мастер-класс', price: 35, time: '10:00', rating: 9.6, image_url: 'https://uzbekistan.travel/storage/app/media/nuzratilla/ceramics.jpg', active: true },
-    { id: 'ent4', name: 'Театр Навои', city: 'Ташкент', type: 'театр', price: 20, time: '19:00', rating: 9.0, image_url: 'https://uzbekistan.travel/storage/app/media/navoi-theatre.jpg', active: true },
-    { id: 'ent5', name: 'Фестиваль шёлка', city: 'Бухара', type: 'фестиваль', price: 15, time: '11:00', rating: 9.3, image_url: 'https://uzbekistan.travel/storage/app/media/nuzratilla/silk-festival.jpg', active: true }
-  ],
-  top_tours: [
-    {
-      id: 'tt1',
-      display_title: 'Золотой Самарканд',
-      city: 'Самарканд',
-      duration_days: 4,
-      badge_text: 'ПОПУЛЯРНЫЙ',
-      image_url: 'https://uzbekistan.travel/storage/app/media/uploaded-files/1440x810-4.jpg',
-      modules: [
-        { type: 'flights', name: 'Рейс Ташкент → Самарканд', description: 'Uzbekistan Airways', price: 65, status: 'confirmed', enabled: true },
-        { type: 'hotels', name: 'Silk Road Samarkand 5*', description: '3 ночи · завтрак', price: 220, status: 'confirmed', enabled: true },
-        { type: 'transfers', name: 'Все трансферы', description: 'аэропорт + экскурсии', price: 45, status: 'confirmed', enabled: true },
-        { type: 'sights', name: 'Регистан + Шахи-Зинда', description: 'с гидом', price: 25, status: 'confirmed', enabled: true },
-        { type: 'museums', name: 'Обсерватория Улугбека', description: 'входной билет', price: 8, status: 'confirmed', enabled: true },
-        { type: 'restaurants', name: 'Ужин в Platan', description: 'национальная кухня', price: 25, status: 'optional', enabled: false }
-      ],
-      total_price: 363,
-      approved: true
-    },
-    {
-      id: 'tt2',
-      display_title: 'Тур "ZIARAT"',
-      city: 'Бухара',
-      duration_days: 5,
-      badge_text: 'AI ВЫБОР',
-      image_url: 'https://uzbekistan.travel/storage/app/media/nuzratilla/cropped-images/bahouddin-naqshband-1-0-0-0-0-1583472498.jpg',
-      modules: [
-        { type: 'flights', name: 'Рейс Ташкент → Бухара', description: 'Uzbekistan Airways', price: 89, status: 'confirmed', enabled: true },
-        { type: 'hotels', name: 'Hotel & SPA Naqshband 4*', description: '4 ночи · полупансион', price: 240, status: 'confirmed', enabled: true },
-        { type: 'transfers', name: 'Трансфер аэропорт ↔ отель', description: 'оба конца', price: 35, status: 'pending', enabled: true },
-        { type: 'sights', name: 'Комплекс Накшбанди', description: 'паломничество', price: 15, status: 'confirmed', enabled: true },
-        { type: 'sights', name: 'Мемориал аль-Бухари', description: 'паломничество', price: 10, status: 'confirmed', enabled: true },
-        { type: 'guides', name: 'Персональный гид', description: 'Лола · 5 дней', price: 225, status: 'optional', enabled: false }
-      ],
-      total_price: 389,
-      approved: false
-    },
-    {
-      id: 'tt3',
-      display_title: 'Шёлковый путь',
-      city: 'Ташкент',
-      duration_days: 7,
-      badge_text: 'ПРЕМИУМ',
-      image_url: 'https://uzbekistan.travel/storage/app/media/cropped-images/1440x810-10-0-0-0-0-1594711619.jpg',
-      modules: [
-        { type: 'flights', name: 'Перелёт туда-обратно', description: 'Ташкент ↔ Бухара', price: 180, status: 'confirmed', enabled: true },
-        { type: 'hotels', name: 'Отели 4-5* (6 ночей)', description: '3 города', price: 420, status: 'confirmed', enabled: true },
-        { type: 'transfers', name: 'Все трансферы + поезд', description: 'Afrosiyob', price: 120, status: 'confirmed', enabled: true },
-        { type: 'sights', name: 'Экскурсии во всех городах', description: 'гид включён', price: 95, status: 'confirmed', enabled: true },
-        { type: 'restaurants', name: 'Завтраки + 4 ужина', description: 'нац. кухня', price: 150, status: 'confirmed', enabled: true },
-        { type: 'entertainment', name: 'Шоу танцев', description: 'вечерняя программа', price: 30, status: 'optional', enabled: false },
-        { type: 'recreation', name: 'Хаммам', description: 'SPA процедуры', price: 45, status: 'optional', enabled: false }
-      ],
-      total_price: 965,
-      approved: false
-    }
-  ],
-  top_destinations: [
-    {
-      id: 'td1',
-      display_title: 'Регистан',
-      city: 'Самарканд',
-      rating: 9.8,
-      image_url: 'https://uzbekistan.travel/storage/app/media/uploaded-files/1440x810-4.jpg',
-      modules: [
-        { type: 'sights', name: 'Площадь Регистан', description: '3 медресе', price: 8, status: 'confirmed', enabled: true },
-        { type: 'guides', name: 'Гид на 2 часа', description: 'русский/английский', price: 25, status: 'confirmed', enabled: true },
-        { type: 'food', name: 'Чай + сладости', description: 'в чайхане', price: 5, status: 'optional', enabled: false }
-      ],
-      price: 33,
-      approved: true
-    },
-    {
-      id: 'td2',
-      display_title: 'Ляби-хауз',
-      city: 'Бухара',
-      rating: 9.4,
-      image_url: 'https://uzbekistan.travel/storage/app/media/nuzratilla/cropped-images/lyabi-house-1-0-0-0-0-1583389188.jpg',
-      modules: [
-        { type: 'sights', name: 'Ансамбль Ляби-хауз', description: 'медресе + ханака', price: 0, status: 'confirmed', enabled: true },
-        { type: 'restaurants', name: 'Ужин у воды', description: 'ресторан Lyabi House', price: 25, status: 'confirmed', enabled: true },
-        { type: 'entertainment', name: 'Живая музыка', description: 'вечер', price: 10, status: 'confirmed', enabled: true }
-      ],
-      price: 35,
-      approved: false
-    },
-    {
-      id: 'td3',
-      display_title: 'Ичан-Кала',
-      city: 'Хива',
-      rating: 9.7,
-      image_url: 'https://uzbekistan.travel/storage/app/media/uploaded-files/khiva-1440x810.jpg',
-      modules: [
-        { type: 'sights', name: 'Старый город Хива', description: 'UNESCO · весь день', price: 10, status: 'confirmed', enabled: true },
-        { type: 'guides', name: 'Гид на 4 часа', description: 'Алишер', price: 40, status: 'confirmed', enabled: true },
-        { type: 'food', name: 'Обед в чайхане', description: 'плов + чай', price: 8, status: 'confirmed', enabled: true }
-      ],
-      price: 58,
-      approved: true
-    }
-  ]
-};
-
-// ============================================
 // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
 // ============================================
 let currentSection = 'top_tours';
-let allData = {};
+let allData = [];
 let filteredData = [];
 let editingId = null;
 let moduleCounter = 1000;
+let isConnected = false;
 
 // ============================================
-// АВТОРИЗАЦИЯ
+// SUPABASE API
 // ============================================
-function login() {
-  const pwd = document.getElementById('loginPassword').value;
-  if (pwd === PASSWORD) {
-    sessionStorage.setItem('waylo_auth', '1');
-    document.getElementById('lock').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    initApp();
+async function supabaseRequest(table, options = {}) {
+  const { method = 'GET', body, query = '' } = options;
+  
+  const url = `${SUPABASE_URL}/rest/v1/${table}${query}`;
+  
+  const headers = {
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${SUPABASE_KEY}`,
+    'Content-Type': 'application/json',
+    'Prefer': method === 'POST' ? 'return=representation' : 'return=minimal'
+  };
+  
+  try {
+    const response = await fetch(url, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined
+    });
+    
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error);
+    }
+    
+    if (method === 'GET' || method === 'POST') {
+      return await response.json();
+    }
+    return true;
+  } catch (error) {
+    console.error('Supabase error:', error);
+    throw error;
+  }
+}
+
+// ============================================
+// ПОДКЛЮЧЕНИЕ К SUPABASE
+// ============================================
+async function connectSupabase() {
+  const url = document.getElementById('inputUrl').value.trim();
+  const key = document.getElementById('inputKey').value.trim();
+  const password = document.getElementById('inputPassword').value;
+  
+  // Проверка пароля админки
+  if (password !== ADMIN_PASSWORD) {
+    document.getElementById('loginError').textContent = 'Неверный пароль админки';
+    return;
+  }
+  
+  if (!url || !key) {
+    document.getElementById('loginError').textContent = 'Введите URL и ключ Supabase';
+    return;
+  }
+  
+  document.getElementById('loginError').textContent = '';
+  document.getElementById('loginSuccess').textContent = 'Подключение...';
+  document.getElementById('connectBtn').disabled = true;
+  
+  SUPABASE_URL = url.replace(/\/$/, ''); // Убрать / в конце
+  SUPABASE_KEY = key;
+  
+  try {
+    // Проверяем подключение - пробуем загрузить данные
+    await supabaseRequest('top_tours', { query: '?limit=1' });
+    
+    // Сохраняем в localStorage
+    localStorage.setItem('waylo_url', SUPABASE_URL);
+    localStorage.setItem('waylo_key', SUPABASE_KEY);
+    localStorage.setItem('waylo_auth', '1');
+    
+    isConnected = true;
+    document.getElementById('loginSuccess').textContent = '✓ Подключено!';
+    
+    setTimeout(() => {
+      document.getElementById('lock').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      updateConnectionStatus();
+      initApp();
+    }, 500);
+    
+  } catch (error) {
+    document.getElementById('loginError').textContent = 'Ошибка подключения: ' + error.message;
+    document.getElementById('loginSuccess').textContent = '';
+    document.getElementById('connectBtn').disabled = false;
+  }
+}
+
+function updateConnectionStatus() {
+  const dot = document.getElementById('connDot');
+  const label = document.getElementById('connLabel');
+  
+  if (isConnected) {
+    dot.classList.remove('off');
+    label.textContent = 'Supabase Online';
   } else {
-    document.getElementById('loginError').style.opacity = '1';
-    document.getElementById('loginPassword').value = '';
-    setTimeout(() => document.getElementById('loginError').style.opacity = '0', 2000);
+    dot.classList.add('off');
+    label.textContent = 'Не подключено';
   }
 }
 
 function logout() {
-  sessionStorage.removeItem('waylo_auth');
+  localStorage.removeItem('waylo_url');
+  localStorage.removeItem('waylo_key');
+  localStorage.removeItem('waylo_auth');
   location.reload();
 }
 
 // ============================================
 // ИНИЦИАЛИЗАЦИЯ
 // ============================================
-function initApp() {
-  // Загрузка демо-данных
-  Object.keys(DEMO_DATA).forEach(key => {
-    allData[key] = [...DEMO_DATA[key]];
-    updateCounter(key);
-  });
+async function initApp() {
+  // Загрузка счётчиков для всех разделов
+  for (const section of Object.keys(SECTIONS)) {
+    try {
+      const data = await supabaseRequest(section, { query: '?select=id' });
+      document.getElementById('cnt-' + section).textContent = data.length;
+    } catch (e) {
+      console.log('Section not found:', section);
+    }
+  }
   
   switchSection('top_tours');
-}
-
-function updateCounter(section) {
-  const el = document.getElementById('cnt-' + section);
-  if (el && allData[section]) {
-    el.textContent = allData[section].length;
-  }
 }
 
 // ============================================
@@ -906,7 +756,6 @@ function switchSection(section) {
   // Обновление заголовка
   document.getElementById('sectionTitle').textContent = cfg.title;
   document.getElementById('sectionBadge').textContent = cfg.badge;
-  document.getElementById('sectionBadge').className = 'tb-badge ' + (cfg.hasApprove ? 'badge-green' : '');
   
   // Обновление статистики
   document.getElementById('statActiveLabel').textContent = cfg.hasApprove ? 'Approved' : 'Активных';
@@ -918,28 +767,52 @@ function switchSection(section) {
   loadSectionData();
 }
 
-function loadSectionData() {
-  filteredData = allData[currentSection] || [];
-  updateStats();
-  filterData();
+async function loadSectionData() {
+  const cfg = SECTIONS[currentSection];
+  
+  // Показываем загрузку
+  document.getElementById('tableBody').innerHTML = `
+    <tr><td colspan="${cfg.columns.length + 1}">
+      <div class="loading">
+        <div class="spinner"></div>
+        Загрузка данных...
+      </div>
+    </td></tr>`;
+  
+  try {
+    allData = await supabaseRequest(currentSection, { query: '?order=created_at.desc' });
+    document.getElementById('cnt-' + currentSection).textContent = allData.length;
+    updateStats();
+    filterData();
+    document.getElementById('tableStatus').textContent = '✓ Синхронизировано';
+  } catch (error) {
+    document.getElementById('tableBody').innerHTML = `
+      <tr><td colspan="${cfg.columns.length + 1}">
+        <div class="empty">
+          <div class="empty-icon">⚠️</div>
+          <p>Ошибка загрузки: ${error.message}</p>
+          <p style="font-size:11px;margin-top:8px">Возможно таблица "${currentSection}" не создана в Supabase</p>
+        </div>
+      </td></tr>`;
+    document.getElementById('tableStatus').textContent = '❌ Ошибка';
+  }
 }
 
 function updateStats() {
-  const data = allData[currentSection] || [];
   const cfg = SECTIONS[currentSection];
   
-  document.getElementById('statTotal').textContent = data.length;
+  document.getElementById('statTotal').textContent = allData.length;
   
   if (cfg.hasApprove) {
-    const approved = data.filter(r => r.approved).length;
+    const approved = allData.filter(r => r.approved).length;
     document.getElementById('statActive').textContent = approved;
   } else {
-    const active = data.filter(r => r.active).length;
+    const active = allData.filter(r => r.active).length;
     document.getElementById('statActive').textContent = active;
   }
   
   const priceField = cfg.priceField;
-  const prices = data.map(r => r[priceField] || 0).filter(p => p > 0);
+  const prices = allData.map(r => r[priceField] || 0).filter(p => p > 0);
   const avgPrice = prices.length ? Math.round(prices.reduce((a, b) => a + b, 0) / prices.length) : 0;
   document.getElementById('statPrice').textContent = '$' + avgPrice;
 }
@@ -953,7 +826,7 @@ function filterData() {
   const status = document.getElementById('filterStatus').value;
   const cfg = SECTIONS[currentSection];
   
-  filteredData = (allData[currentSection] || []).filter(row => {
+  filteredData = allData.filter(row => {
     if (search && !JSON.stringify(row).toLowerCase().includes(search)) return false;
     if (city && row.city !== city) return false;
     if (cfg.hasApprove) {
@@ -971,11 +844,9 @@ function renderTable() {
   const columns = cfg.columns;
   const labels = cfg.columnLabels;
   
-  // Заголовок таблицы
   document.getElementById('tableHead').innerHTML = 
     columns.map(col => `<th>${labels[col] || col}</th>`).join('') + '<th></th>';
   
-  // Тело таблицы
   if (filteredData.length === 0) {
     document.getElementById('tableBody').innerHTML = `
       <tr><td colspan="${columns.length + 1}">
@@ -1005,51 +876,11 @@ function renderTable() {
   }
   
   document.getElementById('tableCount').textContent = filteredData.length + ' записей';
-  
-  // Привязка обработчиков событий
   bindTableEvents();
-}
-
-function bindTableEvents() {
-  // Обработчик для строк (клик = редактирование)
-  document.querySelectorAll('#tableBody tr[data-row-id]').forEach(row => {
-    row.addEventListener('click', function(e) {
-      // Игнорируем клики по кнопкам
-      if (e.target.closest('button') || e.target.closest('.actions')) return;
-      const id = this.dataset.rowId;
-      openEditModal(id);
-    });
-  });
-  
-  // Обработчики для кнопок
-  document.querySelectorAll('[data-action="approve"]').forEach(btn => {
-    btn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      e.preventDefault();
-      approveRecord(this.dataset.id);
-    });
-  });
-  
-  document.querySelectorAll('[data-action="edit"]').forEach(btn => {
-    btn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      e.preventDefault();
-      openEditModal(this.dataset.id);
-    });
-  });
-  
-  document.querySelectorAll('[data-action="delete"]').forEach(btn => {
-    btn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      e.preventDefault();
-      deleteRecord(this.dataset.id);
-    });
-  });
 }
 
 function renderCell(col, val, row) {
   if (col === 'image_url') {
-    // Для отелей берём первое фото из галереи если нет image_url
     let imgUrl = val;
     if (!imgUrl && row.gallery && row.gallery.length > 0) {
       imgUrl = row.gallery[0];
@@ -1083,6 +914,36 @@ function renderCell(col, val, row) {
   return `<td>${val !== null && val !== undefined ? val : '-'}</td>`;
 }
 
+function bindTableEvents() {
+  document.querySelectorAll('#tableBody tr[data-row-id]').forEach(row => {
+    row.addEventListener('click', function(e) {
+      if (e.target.closest('button') || e.target.closest('.actions')) return;
+      openEditModal(this.dataset.rowId);
+    });
+  });
+  
+  document.querySelectorAll('[data-action="approve"]').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      approveRecord(this.dataset.id);
+    });
+  });
+  
+  document.querySelectorAll('[data-action="edit"]').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      openEditModal(this.dataset.id);
+    });
+  });
+  
+  document.querySelectorAll('[data-action="delete"]').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      deleteRecord(this.dataset.id);
+    });
+  });
+}
+
 // ============================================
 // МОДАЛЬНОЕ ОКНО
 // ============================================
@@ -1095,12 +956,10 @@ function openAddModal() {
 
 function openEditModal(id) {
   editingId = id;
-  const record = (allData[currentSection] || []).find(r => r.id === id);
+  const record = allData.find(r => r.id === id);
   document.getElementById('modalTitle').textContent = 'Редактировать';
   buildForm(record);
   document.getElementById('modal').classList.add('open');
-  
-  // Обновить итого для модулей
   setTimeout(() => calculateModulesTotal(), 100);
 }
 
@@ -1118,7 +977,6 @@ function buildForm(record) {
   fields.forEach(field => {
     const val = record ? (record[field.key] ?? '') : '';
     
-    // Специальные типы полей на всю ширину
     if (field.type === 'rooms') {
       let roomsVal = [];
       try { if (val) roomsVal = typeof val === 'string' ? JSON.parse(val) : val; } catch(e) {}
@@ -1137,20 +995,17 @@ function buildForm(record) {
       let galleryVal = [];
       try { if (val) galleryVal = typeof val === 'string' ? JSON.parse(val) : val; } catch(e) {}
       
-      html += '<div class="form-group full"><label class="form-label">Галерея (до 50 фото, макс. 100 KB)</label>';
+      html += '<div class="form-group full"><label class="form-label">Галерея (до 50 фото)</label>';
       html += '<div class="gallery-grid" id="gallery-grid">';
       if (Array.isArray(galleryVal)) galleryVal.forEach((url, i) => { html += buildGalleryThumb(i, url); });
       html += '</div>';
-      html += '<label class="btn btn-ghost btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px">' +
-              '📁 Загрузить с диска' +
-              '<input type="file" accept="image/*" multiple style="display:none" onchange="handleGalleryUpload(event)"></label>' +
-              '<span id="gallery-count" style="font-size:11px;color:var(--tx3);margin-left:10px">' + (galleryVal.length || 0) + '/50 фото</span>';
+      html += '<label class="btn btn-ghost btn-sm" style="cursor:pointer">📁 Загрузить<input type="file" accept="image/*" multiple style="display:none" onchange="handleGalleryUpload(event)"></label>';
+      html += '<span id="gallery-count" style="font-size:11px;color:var(--tx3);margin-left:10px">' + (galleryVal.length || 0) + '/50</span>';
       html += '</div>';
       return;
     }
     
     const fullClass = (field.type === 'photo' || field.type === 'textarea') ? 'full' : '';
-    
     html += `<div class="form-group ${fullClass}">`;
     html += `<label class="form-label">${field.label}${field.required ? ' *' : ''}</label>`;
     
@@ -1158,7 +1013,7 @@ function buildForm(record) {
       html += `<input class="form-input" id="field-${field.key}" type="${field.type}" value="${val}" placeholder="${field.placeholder || ''}">`;
     } else if (field.type === 'city') {
       html += `<select class="form-select" id="field-${field.key}">
-        <option value="">Выберите город</option>
+        <option value="">Выберите</option>
         <option ${val === 'Ташкент' ? 'selected' : ''}>Ташкент</option>
         <option ${val === 'Самарканд' ? 'selected' : ''}>Самарканд</option>
         <option ${val === 'Бухара' ? 'selected' : ''}>Бухара</option>
@@ -1186,7 +1041,6 @@ function buildForm(record) {
   
   html += '</div>';
   
-  // Конструктор модулей
   if (cfg.hasModules) {
     html += buildModulesSection(record?.modules || []);
   }
@@ -1194,43 +1048,35 @@ function buildForm(record) {
   document.getElementById('modalBody').innerHTML = html;
 }
 
+function updatePhotoPreview() {
+  const input = document.getElementById('field-image_url');
+  const preview = document.getElementById('photoPreview');
+  if (input && preview) {
+    preview.innerHTML = input.value ? `<img src="${input.value}" onerror="this.parentNode.innerHTML='Ошибка'">` : 'Нет фото';
+  }
+}
+
 // ============================================
-// ROOMS - Номера отелей
+// ROOMS
 // ============================================
 function buildRoomRow(i, r) {
   return `<div class="room-row" id="room-row-${i}">
-    <div>
-      <span class="room-label">Тип номера</span>
-      <input class="room-input" id="room-type-${i}" type="text" value="${r.type || ''}" placeholder="Standard Double">
-    </div>
-    <div>
-      <span class="room-label">Цена ($)</span>
-      <input class="room-input" id="room-price-${i}" type="number" value="${r.price || ''}" placeholder="0">
-    </div>
-    <div>
-      <span class="room-label">Сезон с</span>
-      <input class="room-input" id="room-from-${i}" type="date" value="${r.date_from || ''}">
-    </div>
-    <div>
-      <span class="room-label">Сезон по</span>
-      <input class="room-input" id="room-to-${i}" type="date" value="${r.date_to || ''}">
-    </div>
-    <div style="padding-bottom:1px">
-      <button type="button" class="btn btn-danger btn-sm" onclick="removeRoomRow(${i})">✕</button>
-    </div>
+    <div><span class="room-label">Тип номера</span><input class="room-input" id="room-type-${i}" type="text" value="${r.type || ''}" placeholder="Standard Double"></div>
+    <div><span class="room-label">Цена ($)</span><input class="room-input" id="room-price-${i}" type="number" value="${r.price || ''}" placeholder="0"></div>
+    <div><span class="room-label">Сезон с</span><input class="room-input" id="room-from-${i}" type="date" value="${r.date_from || ''}"></div>
+    <div><span class="room-label">Сезон по</span><input class="room-input" id="room-to-${i}" type="date" value="${r.date_to || ''}"></div>
+    <div><button type="button" class="btn btn-danger btn-sm" onclick="removeRoomRow(${i})">✕</button></div>
   </div>`;
 }
 
 function addRoomRow() {
   const list = document.getElementById('rooms-list');
   if (!list) return;
-  
   let max = 0;
   list.querySelectorAll('[id^="room-row-"]').forEach(el => {
     const n = parseInt(el.id.replace('room-row-', '')) || 0;
     if (n >= max) max = n + 1;
   });
-  
   const div = document.createElement('div');
   div.innerHTML = buildRoomRow(max, {});
   list.appendChild(div.firstChild);
@@ -1251,7 +1097,6 @@ function removeRoomRow(i) {
 function collectRooms() {
   const list = document.getElementById('rooms-list');
   if (!list) return [];
-  
   const rows = [];
   list.querySelectorAll('[id^="room-row-"]').forEach(el => {
     const i = el.id.replace('room-row-', '');
@@ -1270,7 +1115,7 @@ function collectRooms() {
 }
 
 // ============================================
-// GALLERY - Галерея отелей
+// GALLERY
 // ============================================
 function buildGalleryThumb(i, url) {
   return `<div class="gallery-thumb" id="gth-${i}">
@@ -1290,7 +1135,7 @@ function updateGalleryCount() {
   if (!grid) return;
   const cnt = grid.querySelectorAll('[id^="gth-"]').length;
   const c = document.getElementById('gallery-count');
-  if (c) c.textContent = cnt + '/50 фото';
+  if (c) c.textContent = cnt + '/50';
 }
 
 function handleGalleryUpload(e) {
@@ -1298,19 +1143,8 @@ function handleGalleryUpload(e) {
   const grid = document.getElementById('gallery-grid');
   if (!grid) return;
   
-  const current = grid.querySelectorAll('[id^="gth-"]').length;
-  const allowed = 50 - current;
-  if (allowed <= 0) {
-    showToast('Галерея заполнена (50 фото макс.)', 'red');
-    return;
-  }
-  
-  let errors = [];
-  files.slice(0, allowed).forEach(file => {
-    if (file.size > 100 * 1024) {
-      errors.push(file.name + ' > 100 KB');
-      return;
-    }
+  files.forEach(file => {
+    if (file.size > 100 * 1024) return;
     if (!file.type.startsWith('image/')) return;
     
     const reader = new FileReader();
@@ -1324,11 +1158,7 @@ function handleGalleryUpload(e) {
     };
     reader.readAsDataURL(file);
   });
-  
   e.target.value = '';
-  if (errors.length) {
-    setTimeout(() => { showToast('Пропущено (>100KB): ' + errors.join(', '), 'red'); }, 500);
-  }
 }
 
 function collectGallery() {
@@ -1341,47 +1171,24 @@ function collectGallery() {
   return urls;
 }
 
-function updatePhotoPreview() {
-  const input = document.getElementById('field-image_url');
-  const preview = document.getElementById('photoPreview');
-  if (input && preview) {
-    preview.innerHTML = input.value ? `<img src="${input.value}" onerror="this.parentNode.innerHTML='Ошибка загрузки'">` : 'Нет фото';
-  }
-}
-
 // ============================================
-// КОНСТРУКТОР МОДУЛЕЙ
+// MODULES
 // ============================================
 function buildModulesSection(modules) {
   let html = '<div class="modules-section">';
-  html += '<div class="modules-title">🧩 Модули <span>(что включено в предложение)</span></div>';
-  
-  // Список модулей
+  html += '<div class="modules-title">🧩 Модули <span>(что включено)</span></div>';
   html += '<div class="module-list" id="moduleList">';
   if (modules && modules.length) {
-    modules.forEach((mod, i) => {
-      html += buildModuleItem(i, mod);
-    });
+    modules.forEach((mod, i) => { html += buildModuleItem(i, mod); });
   }
   html += '</div>';
-  
-  // Кнопки добавления
   html += '<div class="add-modules">';
   Object.keys(MODULE_TYPES).forEach(type => {
     const t = MODULE_TYPES[type];
-    html += `<button type="button" class="add-module-btn" onclick="addModule('${type}')" title="${t.label}">
-      ${t.icon}
-      <span class="label">${t.label}</span>
-    </button>`;
+    html += `<button type="button" class="add-module-btn" onclick="addModule('${type}')">${t.icon}<span class="label">${t.label}</span></button>`;
   });
   html += '</div>';
-  
-  // Итого
-  html += `<div class="modules-total">
-    <span class="modules-total-label">💰 Итого:</span>
-    <span class="modules-total-value" id="modulesTotal">$0</span>
-  </div>`;
-  
+  html += `<div class="modules-total"><span class="modules-total-label">💰 Итого:</span><span class="modules-total-value" id="modulesTotal">$0</span></div>`;
   html += '</div>';
   return html;
 }
@@ -1389,21 +1196,15 @@ function buildModulesSection(modules) {
 function buildModuleItem(index, data) {
   const type = MODULE_TYPES[data.type] || { icon: '📦', color: 'guides' };
   const isEnabled = data.enabled !== false;
-  const statusClass = data.status === 'confirmed' ? 'status-confirmed' : 
-                      data.status === 'pending' ? 'status-pending' : 'status-optional';
-  const statusText = data.status === 'confirmed' ? 'CONFIRMED' : 
-                     data.status === 'pending' ? 'PENDING' : 'ДОБАВИТЬ';
+  const statusClass = data.status === 'confirmed' ? 'status-confirmed' : data.status === 'pending' ? 'status-pending' : 'status-optional';
   
   return `<div class="module-item ${isEnabled ? '' : 'disabled'}" data-index="${index}">
     <div class="module-icon ${data.type}">${type.icon}</div>
     <div class="module-body">
       <input type="text" class="module-name" data-field="name" value="${data.name || ''}" placeholder="Название">
-      <input type="text" class="module-desc" data-field="description" value="${data.description || ''}" placeholder="Описание...">
+      <input type="text" class="module-desc" data-field="description" value="${data.description || ''}" placeholder="Описание">
     </div>
-    <div class="module-price">
-      <span>$</span>
-      <input type="number" data-field="price" value="${data.price || 0}" oninput="calculateModulesTotal()">
-    </div>
+    <div class="module-price"><span>$</span><input type="number" data-field="price" value="${data.price || 0}" oninput="calculateModulesTotal()"></div>
     <div class="module-status">
       <select data-field="status" class="status-badge ${statusClass}" onchange="updateModuleStatus(this)">
         <option value="confirmed" ${data.status === 'confirmed' ? 'selected' : ''}>CONFIRMED</option>
@@ -1411,10 +1212,7 @@ function buildModuleItem(index, data) {
         <option value="optional" ${data.status === 'optional' ? 'selected' : ''}>ДОБАВИТЬ</option>
       </select>
     </div>
-    <label class="toggle">
-      <input type="checkbox" data-field="enabled" ${isEnabled ? 'checked' : ''} onchange="toggleModuleEnabled(this)">
-      <span class="toggle-slider"></span>
-    </label>
+    <label class="toggle"><input type="checkbox" data-field="enabled" ${isEnabled ? 'checked' : ''} onchange="toggleModuleEnabled(this)"><span class="toggle-slider"></span></label>
     <button type="button" class="module-delete" onclick="removeModule(${index})">−</button>
     <input type="hidden" data-field="type" value="${data.type || ''}">
   </div>`;
@@ -1423,66 +1221,32 @@ function buildModuleItem(index, data) {
 function addModule(type) {
   const list = document.getElementById('moduleList');
   if (!list) return;
-  
   const index = moduleCounter++;
   const t = MODULE_TYPES[type];
-  const newModule = {
-    type: type,
-    name: t.label,
-    description: '',
-    price: 0,
-    status: 'confirmed',
-    enabled: true
-  };
-  
   const div = document.createElement('div');
-  div.innerHTML = buildModuleItem(index, newModule);
-  const item = div.firstElementChild;
-  
-  // Анимация появления
-  item.style.opacity = '0';
-  item.style.transform = 'translateY(-10px)';
-  list.appendChild(item);
-  
-  setTimeout(() => {
-    item.style.transition = 'all 0.2s ease';
-    item.style.opacity = '1';
-    item.style.transform = 'translateY(0)';
-  }, 10);
-  
+  div.innerHTML = buildModuleItem(index, { type, name: t.label, description: '', price: 0, status: 'confirmed', enabled: true });
+  list.appendChild(div.firstChild);
   calculateModulesTotal();
 }
 
 function removeModule(index) {
   const item = document.querySelector(`.module-item[data-index="${index}"]`);
   if (item) {
-    item.style.transition = 'all 0.2s ease';
-    item.style.opacity = '0';
-    item.style.transform = 'translateX(20px)';
-    setTimeout(() => {
-      item.remove();
-      calculateModulesTotal();
-    }, 200);
+    item.remove();
+    calculateModulesTotal();
   }
 }
 
 function toggleModuleEnabled(checkbox) {
   const item = checkbox.closest('.module-item');
   if (item) {
-    if (checkbox.checked) {
-      item.classList.remove('disabled');
-    } else {
-      item.classList.add('disabled');
-    }
+    item.classList.toggle('disabled', !checkbox.checked);
     calculateModulesTotal();
   }
 }
 
 function updateModuleStatus(select) {
-  select.className = 'status-badge ' + (
-    select.value === 'confirmed' ? 'status-confirmed' :
-    select.value === 'pending' ? 'status-pending' : 'status-optional'
-  );
+  select.className = 'status-badge ' + (select.value === 'confirmed' ? 'status-confirmed' : select.value === 'pending' ? 'status-pending' : 'status-optional');
 }
 
 function calculateModulesTotal() {
@@ -1494,11 +1258,9 @@ function calculateModulesTotal() {
       total += parseFloat(price.value) || 0;
     }
   });
+  const el = document.getElementById('modulesTotal');
+  if (el) el.textContent = '$' + total;
   
-  const totalEl = document.getElementById('modulesTotal');
-  if (totalEl) totalEl.textContent = '$' + total;
-  
-  // Обновить поле цены в форме
   const priceField = document.getElementById('field-total_price') || document.getElementById('field-price');
   if (priceField) priceField.value = total;
 }
@@ -1519,15 +1281,13 @@ function collectModules() {
 }
 
 // ============================================
-// СОХРАНЕНИЕ / УДАЛЕНИЕ / APPROVE
+// SAVE / DELETE / APPROVE
 // ============================================
-function saveRecord() {
+async function saveRecord() {
   const cfg = SECTIONS[currentSection];
   const record = {};
   
-  // Собираем поля формы
   cfg.fields.forEach(field => {
-    // Специальные типы
     if (field.type === 'rooms') {
       record[field.key] = collectRooms();
       return;
@@ -1547,76 +1307,76 @@ function saveRecord() {
     record[field.key] = val;
   });
   
-  // Для отелей: вычисляем price_from на основе минимальной цены номера
   if (currentSection === 'hotels' && record.rooms && record.rooms.length > 0) {
     const prices = record.rooms.map(r => r.price).filter(p => p > 0);
-    if (prices.length > 0) {
-      record.price_from = Math.min(...prices);
-    }
+    if (prices.length > 0) record.price_from = Math.min(...prices);
   }
   
-  // Собираем модули
   if (cfg.hasModules) {
     record.modules = collectModules();
-    // Пересчитываем цену
-    record[cfg.priceField] = record.modules
-      .filter(m => m.enabled)
-      .reduce((sum, m) => sum + (m.price || 0), 0);
+    record[cfg.priceField] = record.modules.filter(m => m.enabled).reduce((sum, m) => sum + (m.price || 0), 0);
   }
   
-  if (editingId) {
-    // Редактирование
-    const index = allData[currentSection].findIndex(r => r.id === editingId);
-    if (index !== -1) {
-      record.id = editingId;
-      record.approved = allData[currentSection][index].approved;
-      record.active = allData[currentSection][index].active;
-      allData[currentSection][index] = record;
+  document.getElementById('saveBtn').disabled = true;
+  document.getElementById('saveBtn').textContent = 'Сохранение...';
+  
+  try {
+    if (editingId) {
+      await supabaseRequest(currentSection, {
+        method: 'PATCH',
+        query: `?id=eq.${editingId}`,
+        body: record
+      });
+      showToast('✓ Сохранено в Supabase', 'green');
+    } else {
+      await supabaseRequest(currentSection, {
+        method: 'POST',
+        body: record
+      });
+      showToast('✓ Добавлено в Supabase', 'green');
     }
-    showToast('Сохранено', 'green');
-  } else {
-    // Добавление
-    record.id = currentSection.slice(0, 2) + Date.now();
-    record.approved = false;
-    record.active = true;
-    allData[currentSection].push(record);
-    showToast('Добавлено', 'green');
+    
+    closeModal();
+    loadSectionData();
+  } catch (error) {
+    showToast('Ошибка: ' + error.message, 'red');
+  } finally {
+    document.getElementById('saveBtn').disabled = false;
+    document.getElementById('saveBtn').textContent = 'Сохранить';
   }
-  
-  updateCounter(currentSection);
-  loadSectionData();
-  closeModal();
 }
 
-function deleteRecord(id) {
+async function deleteRecord(id) {
   if (!confirm('Удалить эту запись?')) return;
   
-  const index = allData[currentSection].findIndex(r => r.id === id);
-  if (index !== -1) {
-    allData[currentSection].splice(index, 1);
-    updateCounter(currentSection);
-    loadSectionData();
+  try {
+    await supabaseRequest(currentSection, {
+      method: 'DELETE',
+      query: `?id=eq.${id}`
+    });
     showToast('Удалено', 'red');
+    loadSectionData();
+  } catch (error) {
+    showToast('Ошибка: ' + error.message, 'red');
   }
 }
 
-function approveRecord(id) {
-  const record = allData[currentSection].find(r => r.id === id);
-  
-  if (!record) {
-    showToast('Ошибка: запись не найдена', 'red');
-    return;
+async function approveRecord(id) {
+  try {
+    await supabaseRequest(currentSection, {
+      method: 'PATCH',
+      query: `?id=eq.${id}`,
+      body: { approved: true }
+    });
+    showToast('✓ Approved! Опубликовано в Mini App', 'green');
+    loadSectionData();
+  } catch (error) {
+    showToast('Ошибка: ' + error.message, 'red');
   }
-  
-  // Сразу approve без подтверждения
-  record.approved = true;
-  updateStats();
-  filterData();
-  showToast('✓ Approved! Опубликовано в Mini App', 'green');
 }
 
 // ============================================
-// УТИЛИТЫ
+// UTILS
 // ============================================
 function showToast(message, color) {
   const toast = document.getElementById('toast');
@@ -1631,13 +1391,38 @@ function showToast(message, color) {
 }
 
 // ============================================
-// ЗАПУСК
+// АВТОЗАПУСК
 // ============================================
-if (sessionStorage.getItem('waylo_auth') === '1') {
-  document.getElementById('lock').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  initApp();
-}
+(function() {
+  // Проверяем сохранённые данные
+  const savedUrl = localStorage.getItem('waylo_url');
+  const savedKey = localStorage.getItem('waylo_key');
+  const savedAuth = localStorage.getItem('waylo_auth');
+  
+  if (savedUrl && savedKey && savedAuth === '1') {
+    document.getElementById('inputUrl').value = savedUrl;
+    document.getElementById('inputKey').value = savedKey;
+    
+    // Автоподключение
+    SUPABASE_URL = savedUrl;
+    SUPABASE_KEY = savedKey;
+    
+    document.getElementById('loginSuccess').textContent = 'Автоподключение...';
+    
+    supabaseRequest('top_tours', { query: '?limit=1' })
+      .then(() => {
+        isConnected = true;
+        document.getElementById('lock').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        updateConnectionStatus();
+        initApp();
+      })
+      .catch(() => {
+        document.getElementById('loginSuccess').textContent = '';
+        document.getElementById('loginError').textContent = 'Сессия истекла. Введите пароль.';
+      });
+  }
+})();
 </script>
 </body>
 </html>
