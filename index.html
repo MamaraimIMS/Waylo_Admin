@@ -132,6 +132,13 @@ td.primary{color:var(--tx);font-weight:500}
 .form-textarea{min-height:80px;resize:vertical}
 .photo-preview{height:120px;background:var(--surf3);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--tx3);overflow:hidden;margin-top:8px}
 .photo-preview img{width:100%;height:100%;object-fit:cover}
+.photo-upload-area{margin-top:6px}
+.photo-actions{display:flex;align-items:center;margin-top:8px}
+.photo-hint{font-size:10px;color:var(--tx3);margin-top:6px}
+.photo-placeholder{font-size:13px;color:var(--tx3)}
+.module-nights{display:flex;align-items:center;gap:2px;min-width:55px}
+.module-nights input{background:var(--surf3);border:1px solid var(--b);border-radius:4px;padding:4px;color:var(--tx);font-family:var(--fm);font-size:12px;text-align:center}
+.module-nights span{color:var(--tx3);font-size:11px}
 
 /* Module Constructor */
 .modules-section{margin-top:20px;padding-top:20px;border-top:1px solid var(--b)}
@@ -413,7 +420,58 @@ td.primary{color:var(--tx);font-weight:500}
 // ============================================
 const SUPABASE_URL = 'https://chhxhcduzjlnoieafved.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNoaHhoY2R1empsbm9pZWFmdmVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMDUwNTIsImV4cCI6MjA4ODg4MTA1Mn0.GIQ0RH4WQTjBfgmJ_g9HcfbyUCd1dYgYGZ8u7WlrEdE';
-const ADMIN_PASSWORD = 'w2'; // Пароль для входа в админку
+const ADMIN_PASSWORD = 'w2';
+
+// Локальные данные (синхронизируются с Supabase при онлайн)
+let localData = {
+  top_tours: [
+    { id: 'tt1', display_title: 'Go Registan', city: 'Самарканд', duration_days: 4, badge_text: 'ПОПУЛЯРНЫЙ', image_url: 'https://uzbekistan.travel/storage/app/media/uploaded-files/1440x810-4.jpg', modules: [], total_price: 0, approved: true },
+    { id: 'tt2', display_title: 'Al Buhari', city: 'Бухара', duration_days: 5, badge_text: 'AI ВЫБОР', image_url: 'https://uzbekistan.travel/storage/app/media/nuzratilla/cropped-images/bahouddin-naqshband-1-0-0-0-0-1583472498.jpg', modules: [], total_price: 0, approved: true }
+  ],
+  top_destinations: [
+    { id: 'td1', display_title: 'Регистан', city: 'Самарканд', rating: 9.8, image_url: 'https://uzbekistan.travel/storage/app/media/uploaded-files/1440x810-4.jpg', modules: [], price: 33, approved: true },
+    { id: 'td2', display_title: 'Ичан-Кала', city: 'Хива', rating: 9.7, image_url: 'https://uzbekistan.travel/storage/app/media/uploaded-files/khiva-1440x810.jpg', modules: [], price: 58, approved: true }
+  ],
+  hotels: [
+    { id: 'h1', name: 'Hyatt Regency Tashkent', city: 'Ташкент', stars: '5', rating: 9.2, price_from: 180, board_type: 'BB', rooms: [{ type: 'Standard', price: 180 }], gallery: ['https://cf.bstatic.com/xdata/images/hotel/max1024x768/261636498.jpg'], active: true },
+    { id: 'h2', name: 'Silk Road Samarkand', city: 'Самарканд', stars: '5', rating: 9.5, price_from: 220, board_type: 'BB', rooms: [{ type: 'Deluxe', price: 220 }], gallery: [], active: true },
+    { id: 'h3', name: 'Hotel Naqshband', city: 'Бухара', stars: '4', rating: 8.9, price_from: 85, board_type: 'HB', rooms: [], gallery: [], active: true },
+    { id: 'h4', name: 'Ichan Qala Hotel', city: 'Хива', stars: '4', rating: 8.7, price_from: 65, board_type: 'BB', rooms: [], gallery: [], active: true }
+  ],
+  flights: [
+    { id: 'f1', route: 'Ташкент → Самарканд', airline: 'Uzbekistan Airways', departure: '08:30', duration: '1ч 10м', price: 65, active: true },
+    { id: 'f2', route: 'Ташкент → Бухара', airline: 'Uzbekistan Airways', departure: '07:15', duration: '1ч 25м', price: 89, active: true }
+  ],
+  transfers: [
+    { id: 'tr1', name: 'Аэропорт → Центр', from_city: 'Ташкент', to_city: 'Ташкент', vehicle: 'седан', price: 15, duration_hours: 0.5, active: true },
+    { id: 'tr2', name: 'Ташкент → Самарканд', from_city: 'Ташкент', to_city: 'Самарканд', vehicle: 'поезд', price: 25, duration_hours: 2, active: true }
+  ],
+  sights: [
+    { id: 's1', name: 'Площадь Регистан', city: 'Самарканд', type: 'UNESCO', entry_price: 8, rating: 9.8, image_url: 'https://uzbekistan.travel/storage/app/media/uploaded-files/1440x810-4.jpg', active: true },
+    { id: 's2', name: 'Ичан-Кала', city: 'Хива', type: 'UNESCO', entry_price: 10, rating: 9.7, image_url: 'https://uzbekistan.travel/storage/app/media/uploaded-files/khiva-1440x810.jpg', active: true },
+    { id: 's3', name: 'Ляби-хауз', city: 'Бухара', type: 'площадь', entry_price: 0, rating: 9.4, image_url: '', active: true }
+  ],
+  restaurants: [
+    { id: 'r1', name: 'Центр плова', city: 'Ташкент', cuisine: 'узбекская', avg_check: 8, rating: 9.3, image_url: '', active: true },
+    { id: 'r2', name: 'Platan', city: 'Самарканд', cuisine: 'узбекская', avg_check: 12, rating: 9.0, image_url: '', active: true }
+  ],
+  food: [
+    { id: 'fo1', name: 'Плов по-самаркандски', city: 'Самарканд', type: 'плов', price: 8, rating: 9.5, image_url: '', active: true }
+  ],
+  recreation: [
+    { id: 're1', name: 'Хаммам традиционный', city: 'Бухара', type: 'хаммам', price: 35, duration_hours: 2, rating: 9.3, active: true }
+  ],
+  entertainment: [
+    { id: 'e1', name: 'Шоу узбекских танцев', city: 'Самарканд', type: 'шоу', price: 25, time: '20:00', rating: 9.4, active: true }
+  ],
+  museums: [
+    { id: 'm1', name: 'Музей Улугбека', city: 'Самарканд', type: 'исторический', entry_price: 4, rating: 9.2, image_url: '', active: true }
+  ],
+  guides: [
+    { id: 'g1', name: 'Тимур Каримов', city: 'Самарканд', languages: 'русский, английский', price_day: 50, rating: 9.6, image_url: '', active: true },
+    { id: 'g2', name: 'Лола Азимова', city: 'Бухара', languages: 'русский, французский', price_day: 45, rating: 9.4, image_url: '', active: true }
+  ]
+}; // Пароль для входа в админку
 
 // Иконки и названия модулей
 const MODULE_TYPES = {
@@ -436,15 +494,13 @@ const SECTIONS = {
     badge: 'Витрина',
     hasApprove: true,
     hasModules: true,
+    modulesOnly: true, // Флаг: данные берутся из модулей
     priceField: 'total_price',
     columns: ['image_url', 'display_title', 'city', 'duration_days', 'total_price', 'approved'],
     columnLabels: { image_url: '', display_title: 'Название', city: 'Город', duration_days: 'Дней', total_price: 'Цена', approved: 'Статус' },
     fields: [
-      { key: 'display_title', label: 'Название тура', type: 'text', required: true, placeholder: 'Тур "ZIARAT" — паломничество' },
-      { key: 'image_url', label: 'Фото', type: 'photo' },
-      { key: 'city', label: 'Город', type: 'city' },
-      { key: 'duration_days', label: 'Дней', type: 'number' },
-      { key: 'badge_text', label: 'Бейдж', type: 'text', placeholder: 'AI ВЫБОР' }
+      { key: 'display_title', label: 'Название тура', type: 'text', required: true, placeholder: 'Золотой Самарканд' },
+      { key: 'badge_text', label: 'Бейдж', type: 'text', placeholder: 'AI ВЫБОР, ПОПУЛЯРНЫЙ' }
     ]
   },
   top_destinations: {
@@ -452,14 +508,13 @@ const SECTIONS = {
     badge: 'Витрина',
     hasApprove: true,
     hasModules: true,
+    modulesOnly: true, // Флаг: данные берутся из модулей
     priceField: 'price',
     columns: ['image_url', 'display_title', 'city', 'rating', 'price', 'approved'],
     columnLabels: { image_url: '', display_title: 'Название', city: 'Город', rating: 'Рейтинг', price: 'Цена', approved: 'Статус' },
     fields: [
       { key: 'display_title', label: 'Название', type: 'text', required: true, placeholder: 'Регистан — жемчужина востока' },
-      { key: 'image_url', label: 'Фото', type: 'photo' },
-      { key: 'city', label: 'Город', type: 'city' },
-      { key: 'rating', label: 'Рейтинг', type: 'number', placeholder: '9.5' }
+      { key: 'badge_text', label: 'Бейдж', type: 'text', placeholder: 'UNESCO, MUST SEE' }
     ]
   },
   hotels: {
@@ -686,23 +741,19 @@ async function supabaseRequest(table, options = {}) {
 async function connectSupabase() {
   const password = document.getElementById('inputPassword').value;
   
-  // Проверка пароля
   if (password !== ADMIN_PASSWORD) {
     document.getElementById('loginError').textContent = 'Неверный пароль';
     return;
   }
   
   document.getElementById('loginError').textContent = '';
-  document.getElementById('loginSuccess').textContent = 'Подключение...';
+  document.getElementById('loginSuccess').textContent = 'Подключение к Supabase...';
   document.getElementById('connectBtn').disabled = true;
   
   try {
-    // Проверяем подключение к Supabase
     await supabaseRequest('top_tours', { query: '?limit=1' });
     
-    localStorage.setItem('waylo_auth', '1');
     isConnected = true;
-    
     document.getElementById('loginSuccess').textContent = '✓ Подключено!';
     
     setTimeout(() => {
@@ -711,9 +762,8 @@ async function connectSupabase() {
       updateConnectionStatus();
       initApp();
     }, 300);
-    
   } catch (error) {
-    document.getElementById('loginError').textContent = 'Ошибка подключения к базе данных';
+    document.getElementById('loginError').textContent = 'Ошибка подключения к базе';
     document.getElementById('loginSuccess').textContent = '';
     document.getElementById('connectBtn').disabled = false;
   }
@@ -741,13 +791,13 @@ function logout() {
 // ИНИЦИАЛИЗАЦИЯ
 // ============================================
 async function initApp() {
-  // Загрузка счётчиков для всех разделов
+  // Загрузка счётчиков из Supabase
   for (const section of Object.keys(SECTIONS)) {
     try {
       const data = await supabaseRequest(section, { query: '?select=id' });
       document.getElementById('cnt-' + section).textContent = data.length;
     } catch (e) {
-      console.log('Section not found:', section);
+      document.getElementById('cnt-' + section).textContent = '0';
     }
   }
   
@@ -787,7 +837,7 @@ async function loadSectionData() {
     <tr><td colspan="${cfg.columns.length + 1}">
       <div class="loading">
         <div class="spinner"></div>
-        Загрузка данных...
+        Загрузка...
       </div>
     </td></tr>`;
   
@@ -802,8 +852,7 @@ async function loadSectionData() {
       <tr><td colspan="${cfg.columns.length + 1}">
         <div class="empty">
           <div class="empty-icon">⚠️</div>
-          <p>Ошибка загрузки: ${error.message}</p>
-          <p style="font-size:11px;margin-top:8px">Возможно таблица "${currentSection}" не создана в Supabase</p>
+          <p>Ошибка: ${error.message}</p>
         </div>
       </td></tr>`;
     document.getElementById('tableStatus').textContent = '❌ Ошибка';
@@ -1044,8 +1093,15 @@ function buildForm(record) {
     } else if (field.type === 'textarea') {
       html += `<textarea class="form-input form-textarea" id="field-${field.key}" placeholder="${field.placeholder || ''}">${val}</textarea>`;
     } else if (field.type === 'photo') {
-      html += `<input class="form-input" id="field-${field.key}" type="text" value="${val}" placeholder="https://..." oninput="updatePhotoPreview()">`;
-      html += `<div class="photo-preview" id="photoPreview">${val ? `<img src="${val}">` : 'Нет фото'}</div>`;
+      html += `<div class="photo-upload-area">`;
+      html += `<div class="photo-preview" id="photoPreview">${val ? `<img src="${val}">` : '<span class="photo-placeholder">📷 Нет фото</span>'}</div>`;
+      html += `<div class="photo-actions">`;
+      html += `<label class="btn btn-ghost btn-sm" style="cursor:pointer">📁 Загрузить фото<input type="file" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)"></label>`;
+      html += `<button type="button" class="btn btn-danger btn-sm" onclick="removePhoto()" style="margin-left:8px">✕ Удалить</button>`;
+      html += `</div>`;
+      html += `<div class="photo-hint">Макс. размер: 100 KB</div>`;
+      html += `<input type="hidden" id="field-${field.key}" value="${val || ''}">`;
+      html += `</div>`;
     }
     
     html += '</div>';
@@ -1064,8 +1120,52 @@ function updatePhotoPreview() {
   const input = document.getElementById('field-image_url');
   const preview = document.getElementById('photoPreview');
   if (input && preview) {
-    preview.innerHTML = input.value ? `<img src="${input.value}" onerror="this.parentNode.innerHTML='Ошибка'">` : 'Нет фото';
+    preview.innerHTML = input.value ? `<img src="${input.value}" onerror="this.parentNode.innerHTML='<span class=photo-placeholder>Ошибка загрузки</span>'">` : '<span class="photo-placeholder">📷 Нет фото</span>';
   }
+}
+
+function handlePhotoUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  // Проверка размера (макс 100 KB)
+  if (file.size > 100 * 1024) {
+    showToast('Файл слишком большой. Макс: 100 KB', 'red');
+    e.target.value = '';
+    return;
+  }
+  
+  // Проверка типа
+  if (!file.type.startsWith('image/')) {
+    showToast('Выберите изображение', 'red');
+    e.target.value = '';
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const base64 = ev.target.result;
+    
+    // Обновляем hidden input
+    const input = document.getElementById('field-image_url');
+    if (input) input.value = base64;
+    
+    // Обновляем превью
+    const preview = document.getElementById('photoPreview');
+    if (preview) preview.innerHTML = `<img src="${base64}">`;
+    
+    showToast('✓ Фото загружено', 'green');
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+}
+
+function removePhoto() {
+  const input = document.getElementById('field-image_url');
+  if (input) input.value = '';
+  
+  const preview = document.getElementById('photoPreview');
+  if (preview) preview.innerHTML = '<span class="photo-placeholder">📷 Нет фото</span>';
 }
 
 // ============================================
@@ -1210,23 +1310,34 @@ function buildModuleItem(index, data) {
   const isEnabled = data.enabled !== false;
   const statusClass = data.status === 'confirmed' ? 'status-confirmed' : data.status === 'pending' ? 'status-pending' : 'status-optional';
   
+  // Для отелей показываем поле "ночей"
+  const nightsField = data.type === 'hotels' 
+    ? `<div class="module-nights"><input type="number" data-field="nights" value="${data.nights || 1}" min="1" max="30" style="width:40px" oninput="calculateModulesTotal()"><span>н.</span></div>`
+    : `<input type="hidden" data-field="nights" value="1">`;
+  
   return `<div class="module-item ${isEnabled ? '' : 'disabled'}" data-index="${index}">
     <div class="module-icon ${data.type}">${type.icon}</div>
     <div class="module-body">
-      <input type="text" class="module-name" data-field="name" value="${data.name || ''}" placeholder="Название">
-      <input type="text" class="module-desc" data-field="description" value="${data.description || ''}" placeholder="Описание">
+      <input type="text" class="module-name" data-field="name" value="${data.name || ''}" placeholder="Название" readonly>
+      <input type="text" class="module-desc" data-field="description" value="${data.description || ''}" placeholder="Описание" readonly>
     </div>
+    ${nightsField}
     <div class="module-price"><span>$</span><input type="number" data-field="price" value="${data.price || 0}" oninput="calculateModulesTotal()"></div>
     <div class="module-status">
       <select data-field="status" class="status-badge ${statusClass}" onchange="updateModuleStatus(this)">
         <option value="confirmed" ${data.status === 'confirmed' ? 'selected' : ''}>CONFIRMED</option>
         <option value="pending" ${data.status === 'pending' ? 'selected' : ''}>PENDING</option>
-        <option value="optional" ${data.status === 'optional' ? 'selected' : ''}>ДОБАВИТЬ</option>
+        <option value="optional" ${data.status === 'optional' ? 'selected' : ''}>OPTIONAL</option>
       </select>
     </div>
     <label class="toggle"><input type="checkbox" data-field="enabled" ${isEnabled ? 'checked' : ''} onchange="toggleModuleEnabled(this)"><span class="toggle-slider"></span></label>
     <button type="button" class="module-delete" onclick="removeModule(${index})">−</button>
     <input type="hidden" data-field="type" value="${data.type || ''}">
+    <input type="hidden" data-field="city" value="${data.city || ''}">
+    <input type="hidden" data-field="image_url" value="${data.image_url || ''}">
+    <input type="hidden" data-field="rating" value="${data.rating || 0}">
+    <input type="hidden" data-field="room_type" value="${data.room_type || ''}">
+    <input type="hidden" data-field="source_id" value="${data.source_id || ''}">
   </div>`;
 }
 
@@ -1246,9 +1357,13 @@ const MODULE_TABLE_MAP = {
 
 let pickerType = '';
 let pickerData = [];
+let pickerStep = 1; // 1 = выбор отеля, 2 = выбор номера
+let selectedHotel = null;
 
 async function addModule(type) {
   pickerType = type;
+  pickerStep = 1;
+  selectedHotel = null;
   const map = MODULE_TABLE_MAP[type];
   const t = MODULE_TYPES[type];
   
@@ -1269,6 +1384,43 @@ function renderPickerItems() {
   const map = MODULE_TABLE_MAP[pickerType];
   const search = document.getElementById('pickerSearch').value.toLowerCase();
   
+  // Шаг 2 для отелей: показываем номера
+  if (pickerType === 'hotels' && pickerStep === 2 && selectedHotel) {
+    const rooms = selectedHotel.rooms || [];
+    
+    if (rooms.length === 0) {
+      document.getElementById('pickerList').innerHTML = '<div class="picker-empty">📭 Нет номеров в этом отеле</div>';
+      return;
+    }
+    
+    const filtered = rooms.filter(room => {
+      const type = (room.type || '').toLowerCase();
+      return type.includes(search);
+    });
+    
+    if (filtered.length === 0) {
+      document.getElementById('pickerList').innerHTML = '<div class="picker-empty">📭 Номера не найдены</div>';
+      return;
+    }
+    
+    document.getElementById('pickerList').innerHTML = filtered.map((room, i) => {
+      const roomType = room.type || 'Standard';
+      const roomPrice = room.price || 0;
+      const dates = room.date_from && room.date_to ? `${room.date_from} - ${room.date_to}` : '';
+      
+      return `<div class="picker-item" onclick="selectRoom(${i})">
+        <div class="picker-item-img" style="display:flex;align-items:center;justify-content:center;font-size:20px">🛏️</div>
+        <div class="picker-item-body">
+          <div class="picker-item-name">${roomType}</div>
+          <div class="picker-item-sub">${selectedHotel.name} • ${dates || 'Круглый год'}</div>
+        </div>
+        <div class="picker-item-price">$${roomPrice}<span style="font-size:10px;color:var(--tx3)">/ночь</span></div>
+      </div>`;
+    }).join('');
+    return;
+  }
+  
+  // Шаг 1: показываем список (отели или другие)
   const filtered = pickerData.filter(item => {
     const name = (item[map.nameField] || '').toLowerCase();
     const desc = (item[map.descField] || '').toLowerCase();
@@ -1292,13 +1444,16 @@ function renderPickerItems() {
       imgUrl = item[map.imgField];
     }
     
+    // Для отелей показываем количество номеров
+    const roomCount = pickerType === 'hotels' && item.rooms ? ` • ${item.rooms.length} номер(ов)` : '';
+    
     return `<div class="picker-item" onclick="selectPickerItem(${i})">
       ${imgUrl ? `<img class="picker-item-img" src="${imgUrl}" onerror="this.style.opacity=0.3">` : '<div class="picker-item-img"></div>'}
       <div class="picker-item-body">
         <div class="picker-item-name">${name}</div>
-        <div class="picker-item-sub">${desc}</div>
+        <div class="picker-item-sub">${desc}${roomCount}</div>
       </div>
-      <div class="picker-item-price">$${price}</div>
+      <div class="picker-item-price">${pickerType === 'hotels' ? 'от ' : ''}$${price}</div>
     </div>`;
   }).join('');
 }
@@ -1320,11 +1475,80 @@ function selectPickerItem(index) {
   const item = filtered[index];
   if (!item) return;
   
+  // Для отелей: переходим к выбору номера
+  if (pickerType === 'hotels') {
+    selectedHotel = item;
+    pickerStep = 2;
+    
+    const t = MODULE_TYPES.hotels;
+    document.getElementById('pickerTitle').innerHTML = `🛏️ Выберите номер: ${item.name}`;
+    document.getElementById('pickerSearch').value = '';
+    renderPickerItems();
+    return;
+  }
+  
+  // Для остальных: сразу добавляем модуль
+  addModuleFromItem(item);
+}
+
+function selectRoom(index) {
+  if (!selectedHotel || !selectedHotel.rooms) return;
+  
+  const search = document.getElementById('pickerSearch').value.toLowerCase();
+  const filtered = selectedHotel.rooms.filter(room => {
+    const type = (room.type || '').toLowerCase();
+    return type.includes(search);
+  });
+  
+  const room = filtered[index];
+  if (!room) return;
+  
+  // Добавляем модуль с данными номера
+  const list = document.getElementById('moduleList');
+  if (!list) return;
+  
+  let imgUrl = '';
+  if (selectedHotel.gallery && selectedHotel.gallery.length) {
+    imgUrl = selectedHotel.gallery[0];
+  }
+  
+  const moduleIndex = moduleCounter++;
+  const div = document.createElement('div');
+  div.innerHTML = buildModuleItem(moduleIndex, {
+    type: 'hotels',
+    name: `${selectedHotel.name} — ${room.type || 'Standard'}`,
+    description: `${selectedHotel.city} • ${selectedHotel.stars || 4}★ • ${selectedHotel.board_type || 'BB'}`,
+    price: room.price || 0,
+    status: 'confirmed',
+    enabled: true,
+    nights: 1,
+    city: selectedHotel.city || '',
+    image_url: imgUrl,
+    rating: selectedHotel.rating || 0,
+    room_type: room.type || 'Standard',
+    source_id: selectedHotel.id
+  });
+  list.appendChild(div.firstChild);
+  calculateModulesTotal();
+  
+  closePicker();
+  showToast(`✓ Добавлено: ${selectedHotel.name} — ${room.type}`, 'green');
+}
+
+function addModuleFromItem(item) {
+  const map = MODULE_TABLE_MAP[pickerType];
+  
   const name = item[map.nameField] || '';
   const desc = item[map.descField] || '';
   const price = item[map.priceField] || 0;
   
-  // Добавляем модуль с реальными данными
+  let imgUrl = '';
+  if (map.imgField === 'gallery' && item.gallery && item.gallery.length) {
+    imgUrl = item.gallery[0];
+  } else if (map.imgField && item[map.imgField]) {
+    imgUrl = item[map.imgField];
+  }
+  
   const list = document.getElementById('moduleList');
   if (!list) return;
   
@@ -1336,7 +1560,11 @@ function selectPickerItem(index) {
     description: desc,
     price: price,
     status: 'confirmed',
-    enabled: true
+    enabled: true,
+    city: item.city || '',
+    image_url: imgUrl,
+    rating: item.rating || 0,
+    source_id: item.id
   });
   list.appendChild(div.firstChild);
   calculateModulesTotal();
@@ -1349,6 +1577,8 @@ function closePicker() {
   document.getElementById('picker').classList.remove('open');
   pickerType = '';
   pickerData = [];
+  pickerStep = 1;
+  selectedHotel = null;
 }
 
 function removeModule(index) {
@@ -1396,7 +1626,14 @@ function collectModules() {
       description: item.querySelector('[data-field="description"]')?.value || '',
       price: parseFloat(item.querySelector('[data-field="price"]')?.value) || 0,
       status: item.querySelector('[data-field="status"]')?.value || 'confirmed',
-      enabled: item.querySelector('[data-field="enabled"]')?.checked ?? true
+      enabled: item.querySelector('[data-field="enabled"]')?.checked ?? true,
+      // Дополнительные данные для вычислений
+      city: item.querySelector('[data-field="city"]')?.value || '',
+      image_url: item.querySelector('[data-field="image_url"]')?.value || '',
+      rating: parseFloat(item.querySelector('[data-field="rating"]')?.value) || 0,
+      nights: parseInt(item.querySelector('[data-field="nights"]')?.value) || 1,
+      room_type: item.querySelector('[data-field="room_type"]')?.value || '',
+      source_id: item.querySelector('[data-field="source_id"]')?.value || ''
     });
   });
   return modules;
@@ -1423,8 +1660,19 @@ async function saveRecord() {
     if (!el) return;
     
     let val = el.value;
-    if (field.type === 'number') val = val === '' ? null : parseFloat(val);
-    else if (field.type === 'boolean') val = val === 'true';
+    
+    // Обработка типов полей
+    if (field.type === 'number') {
+      val = val === '' ? null : parseFloat(val);
+    } else if (field.type === 'boolean') {
+      val = val === 'true';
+    } else if (field.type === 'select' && field.key === 'stars') {
+      // stars должен быть integer
+      val = val === '' ? null : parseInt(val);
+    } else if (field.type === 'select' && val === '') {
+      // Пустой select = null
+      val = null;
+    }
     
     record[field.key] = val;
   });
@@ -1437,6 +1685,29 @@ async function saveRecord() {
   if (cfg.hasModules) {
     record.modules = collectModules();
     record[cfg.priceField] = record.modules.filter(m => m.enabled).reduce((sum, m) => sum + (m.price || 0), 0);
+    
+    // Для modulesOnly разделов: автоматически вычисляем данные из модулей
+    if (cfg.modulesOnly && record.modules.length > 0) {
+      const enabledModules = record.modules.filter(m => m.enabled);
+      
+      // Город = город первого модуля
+      const firstWithCity = enabledModules.find(m => m.city);
+      if (firstWithCity) record.city = firstWithCity.city;
+      
+      // Фото = фото первого модуля с изображением
+      const firstWithImage = enabledModules.find(m => m.image_url);
+      if (firstWithImage) record.image_url = firstWithImage.image_url;
+      
+      // Количество дней = количество модулей hotels (ночей) + 1
+      const hotelNights = enabledModules.filter(m => m.type === 'hotels').reduce((sum, m) => sum + (m.nights || 1), 0);
+      if (hotelNights > 0) record.duration_days = hotelNights + 1;
+      
+      // Рейтинг = средний рейтинг модулей
+      const ratings = enabledModules.map(m => m.rating).filter(r => r > 0);
+      if (ratings.length > 0) {
+        record.rating = Math.round((ratings.reduce((a, b) => a + b, 0) / ratings.length) * 10) / 10;
+      }
+    }
   }
   
   document.getElementById('saveBtn').disabled = true;
@@ -1449,13 +1720,13 @@ async function saveRecord() {
         query: `?id=eq.${editingId}`,
         body: record
       });
-      showToast('✓ Сохранено в Supabase', 'green');
+      showToast('✓ Сохранено', 'green');
     } else {
       await supabaseRequest(currentSection, {
         method: 'POST',
         body: record
       });
-      showToast('✓ Добавлено в Supabase', 'green');
+      showToast('✓ Добавлено', 'green');
     }
     
     closeModal();
@@ -1490,7 +1761,7 @@ async function approveRecord(id) {
       query: `?id=eq.${id}`,
       body: { approved: true }
     });
-    showToast('✓ Approved! Опубликовано в Mini App', 'green');
+    showToast('✓ Approved!', 'green');
     loadSectionData();
   } catch (error) {
     showToast('Ошибка: ' + error.message, 'red');
