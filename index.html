@@ -95,6 +95,13 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--ff)
 .widget-info-icon{font-size:24px}
 .widget-info-title{font-weight:600;font-size:13px;margin-bottom:4px}
 .widget-info-text{font-size:12px;color:var(--tx2)}
+.aviasales-box{background:var(--surf2);border-radius:12px;padding:24px}
+.aviasales-search{margin-bottom:16px}
+.aviasales-row{display:grid;grid-template-columns:1fr 1fr 140px auto;gap:12px;align-items:end}
+.aviasales-field label{display:block;font-size:11px;color:var(--tx3);margin-bottom:6px}
+.aviasales-field .form-select,.aviasales-field .form-input{width:100%}
+.aviasales-btn{height:42px;white-space:nowrap}
+.aviasales-partners{display:flex;align-items:center;justify-content:center;padding-top:12px;border-top:1px solid var(--b)}
 table{width:100%;border-collapse:collapse}
 thead tr{background:var(--surf2)}
 th{padding:12px 14px;text-align:left;font-size:10px;font-weight:600;color:var(--tx3);letter-spacing:.6px;text-transform:uppercase}
@@ -397,13 +404,45 @@ td.primary{color:var(--tx);font-weight:500}
           <p style="color:var(--tx2);font-size:13px;margin-top:8px">Поиск и бронирование авиабилетов через крупнейший агрегатор</p>
         </div>
         <div class="widget-content">
-          <iframe 
-            id="aviasalesFrame"
-            src="https://tp.media/content?trs=267028&shmarker=492499&locale=ru&curr=usd&powered_by=true&border_radius=14&plain=true&color_button=%237c6dfa&color_icons=%237c6dfa&color_focused=%237c6dfa&color_border=%232a2a35&color_bg=%23141418&color_text=%23f0f0f8&promo_id=4838&campaign_id=101"
-            style="width:100%;height:320px;border:none;border-radius:12px"
-            frameborder="0"
-            scrolling="no">
-          </iframe>
+          <div class="aviasales-box">
+            <div class="aviasales-search">
+              <div class="aviasales-row">
+                <div class="aviasales-field">
+                  <label>Откуда</label>
+                  <select id="aviaFrom" class="form-select">
+                    <option value="TAS">Ташкент (TAS)</option>
+                    <option value="SKD">Самарканд (SKD)</option>
+                    <option value="BHK">Бухара (BHK)</option>
+                    <option value="UGC">Ургенч (UGC)</option>
+                  </select>
+                </div>
+                <div class="aviasales-field">
+                  <label>Куда</label>
+                  <select id="aviaTo" class="form-select">
+                    <option value="SKD">Самарканд (SKD)</option>
+                    <option value="TAS">Ташкент (TAS)</option>
+                    <option value="BHK">Бухара (BHK)</option>
+                    <option value="UGC">Ургенч (UGC)</option>
+                    <option value="MOW">Москва (MOW)</option>
+                    <option value="IST">Стамбул (IST)</option>
+                    <option value="DXB">Дубай (DXB)</option>
+                  </select>
+                </div>
+                <div class="aviasales-field">
+                  <label>Дата</label>
+                  <input type="date" id="aviaDate" class="form-input">
+                </div>
+                <button class="btn btn-primary aviasales-btn" onclick="searchAviasales()">
+                  ✈️ Найти билеты
+                </button>
+              </div>
+            </div>
+            <div class="aviasales-partners">
+              <span style="color:var(--tx3);font-size:12px">Поиск на:</span>
+              <img src="https://www.aviasales.ru/favicon.ico" style="height:16px;margin:0 6px">
+              <span style="font-size:13px">Aviasales</span>
+            </div>
+          </div>
         </div>
         <div class="widget-info">
           <div class="widget-info-item">
@@ -1840,6 +1879,39 @@ async function approveRecord(id) {
     showToast('Ошибка: ' + error.message, 'red');
   }
 }
+
+// ============================================
+// AVIASALES
+// ============================================
+function searchAviasales() {
+  const from = document.getElementById('aviaFrom').value;
+  const to = document.getElementById('aviaTo').value;
+  const dateEl = document.getElementById('aviaDate');
+  
+  let dateStr = '';
+  if (dateEl.value) {
+    const d = new Date(dateEl.value);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    dateStr = day + month;
+  }
+  
+  // Формируем URL Aviasales
+  let url = `https://www.aviasales.ru/search/${from}${dateStr}${to}1`;
+  
+  window.open(url, '_blank');
+  showToast('✈️ Открыт поиск на Aviasales', 'green');
+}
+
+// Установка даты по умолчанию (завтра)
+document.addEventListener('DOMContentLoaded', function() {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const aviaDate = document.getElementById('aviaDate');
+  if (aviaDate) {
+    aviaDate.value = tomorrow.toISOString().split('T')[0];
+  }
+});
 
 // ============================================
 // UTILS
