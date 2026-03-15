@@ -109,6 +109,15 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--ff)
 .aviasales-swap:hover{background:var(--acc);color:#fff;border-color:var(--acc)}
 .aviasales-btn{height:42px;white-space:nowrap;padding:0 20px}
 .aviasales-partners{display:flex;align-items:center;justify-content:center;padding-top:12px;border-top:1px solid var(--b)}
+.aviasales-autocomplete{position:relative}
+.autocomplete-list{position:absolute;top:100%;left:0;right:0;background:var(--surf);border:1px solid var(--b2);border-radius:8px;max-height:250px;overflow-y:auto;z-index:100;display:none;margin-top:4px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.autocomplete-list.show{display:block}
+.autocomplete-item{padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--b)}
+.autocomplete-item:last-child{border-bottom:none}
+.autocomplete-item:hover{background:var(--surf2)}
+.autocomplete-item .city{font-weight:500;color:var(--tx)}
+.autocomplete-item .country{font-size:12px;color:var(--tx3)}
+.autocomplete-item .code{margin-left:auto;font-family:var(--fm);font-size:12px;color:var(--acc);background:var(--adim);padding:2px 6px;border-radius:4px}
 table{width:100%;border-collapse:collapse}
 thead tr{background:var(--surf2)}
 th{padding:12px 14px;text-align:left;font-size:10px;font-weight:600;color:var(--tx3);letter-spacing:.6px;text-transform:uppercase}
@@ -240,6 +249,10 @@ td.primary{color:var(--tx);font-weight:500}
 .picker-item{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:10px;cursor:pointer;transition:all .15s;border:1px solid transparent}
 .picker-item:hover{background:var(--surf2);border-color:var(--b)}
 .picker-item-img{width:50px;height:38px;border-radius:6px;object-fit:cover;background:var(--surf3);flex-shrink:0}
+.flight-form{padding:8px}
+.flight-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.flight-field label{display:block;font-size:11px;color:var(--tx3);margin-bottom:6px}
+.flight-field .form-input,.flight-field .form-select{width:100%}
 .picker-item-body{flex:1;min-width:0}
 .picker-item-name{font-weight:500;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .picker-item-sub{font-size:12px;color:var(--tx3);margin-top:2px}
@@ -424,27 +437,18 @@ td.primary{color:var(--tx);font-weight:500}
                 </label>
               </div>
               <div class="aviasales-row">
-                <div class="aviasales-field">
+                <div class="aviasales-field aviasales-autocomplete">
                   <label>Откуда</label>
-                  <select id="aviaFrom" class="form-select">
-                    <option value="TAS">Ташкент (TAS)</option>
-                    <option value="SKD">Самарканд (SKD)</option>
-                    <option value="BHK">Бухара (BHK)</option>
-                    <option value="UGC">Ургенч (UGC)</option>
-                  </select>
+                  <input type="text" id="aviaFromInput" class="form-input" placeholder="Город или аэропорт" autocomplete="off" oninput="searchAirports('from', this.value)">
+                  <input type="hidden" id="aviaFrom" value="TAS">
+                  <div class="autocomplete-list" id="aviaFromList"></div>
                 </div>
                 <button type="button" class="aviasales-swap" onclick="swapCities()" title="Поменять местами">⇄</button>
-                <div class="aviasales-field">
+                <div class="aviasales-field aviasales-autocomplete">
                   <label>Куда</label>
-                  <select id="aviaTo" class="form-select">
-                    <option value="SKD">Самарканд (SKD)</option>
-                    <option value="TAS">Ташкент (TAS)</option>
-                    <option value="BHK">Бухара (BHK)</option>
-                    <option value="UGC">Ургенч (UGC)</option>
-                    <option value="MOW">Москва (MOW)</option>
-                    <option value="IST">Стамбул (IST)</option>
-                    <option value="DXB">Дубай (DXB)</option>
-                  </select>
+                  <input type="text" id="aviaToInput" class="form-input" placeholder="Город или аэропорт" autocomplete="off" oninput="searchAirports('to', this.value)">
+                  <input type="hidden" id="aviaTo" value="SKD">
+                  <div class="autocomplete-list" id="aviaToList"></div>
                 </div>
                 <div class="aviasales-field">
                   <label>Туда</label>
@@ -454,13 +458,13 @@ td.primary{color:var(--tx);font-weight:500}
                   <label>Обратно</label>
                   <input type="date" id="aviaDateReturn" class="form-input">
                 </div>
-                <div class="aviasales-field">
+                <div class="aviasales-field" style="min-width:100px">
                   <label>Пассажиры</label>
                   <select id="aviaPassengers" class="form-select">
-                    <option value="1">1 взрослый</option>
-                    <option value="2">2 взрослых</option>
-                    <option value="3">3 взрослых</option>
-                    <option value="4">4 взрослых</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
                   </select>
                 </div>
                 <button class="btn btn-primary aviasales-btn" onclick="searchAviasales()">
@@ -600,6 +604,7 @@ let localData = {
 
 // Иконки и названия модулей
 const MODULE_TYPES = {
+  flights:      { icon: '✈️', label: 'Авиаперелёт', color: 'flights' },
   hotels:       { icon: '🏨', label: 'Отели', color: 'hotels' },
   transfers:    { icon: '🚗', label: 'Трансфер', color: 'transfers' },
   sights:       { icon: '🏛️', label: 'Экскурсии', color: 'sights' },
@@ -1504,6 +1509,12 @@ let pickerStep = 1; // 1 = выбор отеля, 2 = выбор номера
 let selectedHotel = null;
 
 async function addModule(type) {
+  // Для авиаперелётов — специальная форма ввода
+  if (type === 'flights') {
+    openFlightPicker();
+    return;
+  }
+  
   pickerType = type;
   pickerStep = 1;
   selectedHotel = null;
@@ -1521,6 +1532,86 @@ async function addModule(type) {
   } catch (error) {
     document.getElementById('pickerList').innerHTML = `<div class="picker-empty">❌ Ошибка: ${error.message}</div>`;
   }
+}
+
+// Форма ввода авиаперелёта
+function openFlightPicker() {
+  document.getElementById('pickerTitle').innerHTML = '✈️ Добавить авиаперелёт';
+  document.getElementById('pickerSearch').style.display = 'none';
+  
+  document.getElementById('pickerList').innerHTML = `
+    <div class="flight-form">
+      <div class="flight-row">
+        <div class="flight-field">
+          <label>Откуда</label>
+          <input type="text" id="flightFrom" class="form-input" placeholder="Город" value="Ташкент">
+        </div>
+        <div class="flight-field">
+          <label>Куда</label>
+          <input type="text" id="flightTo" class="form-input" placeholder="Город" value="Самарканд">
+        </div>
+      </div>
+      <div class="flight-row">
+        <div class="flight-field">
+          <label>Авиакомпания</label>
+          <select id="flightAirline" class="form-select">
+            <option>Uzbekistan Airways</option>
+            <option>Qanot Sharq</option>
+            <option>Silk Avia</option>
+            <option>Другая</option>
+          </select>
+        </div>
+        <div class="flight-field">
+          <label>Цена ($)</label>
+          <input type="number" id="flightPrice" class="form-input" placeholder="0" value="65">
+        </div>
+      </div>
+      <div class="flight-row">
+        <div class="flight-field">
+          <label>Время вылета</label>
+          <input type="text" id="flightTime" class="form-input" placeholder="08:30" value="08:30">
+        </div>
+        <div class="flight-field">
+          <label>Время в пути</label>
+          <input type="text" id="flightDuration" class="form-input" placeholder="1ч 10м" value="1ч 10м">
+        </div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="addFlightModule()">
+        ✈️ Добавить перелёт
+      </button>
+    </div>
+  `;
+  
+  document.getElementById('picker').classList.add('open');
+}
+
+function addFlightModule() {
+  const from = document.getElementById('flightFrom').value || 'Город';
+  const to = document.getElementById('flightTo').value || 'Город';
+  const airline = document.getElementById('flightAirline').value;
+  const price = parseFloat(document.getElementById('flightPrice').value) || 0;
+  const time = document.getElementById('flightTime').value || '';
+  const duration = document.getElementById('flightDuration').value || '';
+  
+  const list = document.getElementById('moduleList');
+  if (!list) return;
+  
+  const moduleIndex = moduleCounter++;
+  const div = document.createElement('div');
+  div.innerHTML = buildModuleItem(moduleIndex, {
+    type: 'flights',
+    name: `${from} → ${to}`,
+    description: `${airline} • ${time} • ${duration}`,
+    price: price,
+    status: 'confirmed',
+    enabled: true,
+    city: from
+  });
+  list.appendChild(div.firstChild);
+  calculateModulesTotal();
+  
+  closePicker();
+  showToast(`✓ Добавлен перелёт: ${from} → ${to}`, 'green');
 }
 
 function renderPickerItems() {
@@ -1718,6 +1809,7 @@ function addModuleFromItem(item) {
 
 function closePicker() {
   document.getElementById('picker').classList.remove('open');
+  document.getElementById('pickerSearch').style.display = 'block';
   pickerType = '';
   pickerData = [];
   pickerStep = 1;
@@ -1929,21 +2021,159 @@ function toggleReturnDate() {
   }
 }
 
-function swapCities() {
-  const from = document.getElementById('aviaFrom');
-  const to = document.getElementById('aviaTo');
-  const fromVal = from.value;
-  const toVal = to.value;
+// База популярных аэропортов
+const AIRPORTS = [
+  // Узбекистан
+  { code: 'TAS', city: 'Ташкент', country: 'Узбекистан', name: 'Международный аэропорт Ташкент' },
+  { code: 'SKD', city: 'Самарканд', country: 'Узбекистан', name: 'Аэропорт Самарканд' },
+  { code: 'BHK', city: 'Бухара', country: 'Узбекистан', name: 'Аэропорт Бухара' },
+  { code: 'UGC', city: 'Ургенч', country: 'Узбекистан', name: 'Аэропорт Ургенч' },
+  { code: 'FEG', city: 'Фергана', country: 'Узбекистан', name: 'Аэропорт Фергана' },
+  { code: 'NVI', city: 'Навои', country: 'Узбекистан', name: 'Аэропорт Навои' },
+  { code: 'NCU', city: 'Нукус', country: 'Узбекистан', name: 'Аэропорт Нукус' },
+  { code: 'KSQ', city: 'Карши', country: 'Узбекистан', name: 'Аэропорт Карши' },
+  { code: 'TMJ', city: 'Термез', country: 'Узбекистан', name: 'Аэропорт Термез' },
+  { code: 'NMA', city: 'Наманган', country: 'Узбекистан', name: 'Аэропорт Наманган' },
+  // Россия
+  { code: 'MOW', city: 'Москва', country: 'Россия', name: 'Все аэропорты Москвы' },
+  { code: 'SVO', city: 'Москва', country: 'Россия', name: 'Шереметьево' },
+  { code: 'DME', city: 'Москва', country: 'Россия', name: 'Домодедово' },
+  { code: 'VKO', city: 'Москва', country: 'Россия', name: 'Внуково' },
+  { code: 'LED', city: 'Санкт-Петербург', country: 'Россия', name: 'Пулково' },
+  { code: 'KZN', city: 'Казань', country: 'Россия', name: 'Аэропорт Казань' },
+  { code: 'SVX', city: 'Екатеринбург', country: 'Россия', name: 'Кольцово' },
+  { code: 'OVB', city: 'Новосибирск', country: 'Россия', name: 'Толмачёво' },
+  { code: 'ROV', city: 'Ростов-на-Дону', country: 'Россия', name: 'Платов' },
+  { code: 'AER', city: 'Сочи', country: 'Россия', name: 'Аэропорт Сочи' },
+  // СНГ
+  { code: 'ALA', city: 'Алматы', country: 'Казахстан', name: 'Аэропорт Алматы' },
+  { code: 'NQZ', city: 'Астана', country: 'Казахстан', name: 'Аэропорт Астана' },
+  { code: 'GYD', city: 'Баку', country: 'Азербайджан', name: 'Гейдар Алиев' },
+  { code: 'TBS', city: 'Тбилиси', country: 'Грузия', name: 'Аэропорт Тбилиси' },
+  { code: 'EVN', city: 'Ереван', country: 'Армения', name: 'Звартноц' },
+  { code: 'FRU', city: 'Бишкек', country: 'Кыргызстан', name: 'Манас' },
+  { code: 'DYU', city: 'Душанбе', country: 'Таджикистан', name: 'Аэропорт Душанбе' },
+  { code: 'KIV', city: 'Кишинёв', country: 'Молдова', name: 'Аэропорт Кишинёв' },
+  { code: 'MSQ', city: 'Минск', country: 'Беларусь', name: 'Национальный аэропорт Минск' },
+  { code: 'IEV', city: 'Киев', country: 'Украина', name: 'Жуляны' },
+  // Турция
+  { code: 'IST', city: 'Стамбул', country: 'Турция', name: 'Новый аэропорт Стамбул' },
+  { code: 'SAW', city: 'Стамбул', country: 'Турция', name: 'Сабиха Гёкчен' },
+  { code: 'AYT', city: 'Анталья', country: 'Турция', name: 'Аэропорт Анталья' },
+  { code: 'ADB', city: 'Измир', country: 'Турция', name: 'Аднан Мендерес' },
+  { code: 'ESB', city: 'Анкара', country: 'Турция', name: 'Эсенбога' },
+  { code: 'DLM', city: 'Даламан', country: 'Турция', name: 'Аэропорт Даламан' },
+  { code: 'BJV', city: 'Бодрум', country: 'Турция', name: 'Милас-Бодрум' },
+  // ОАЭ
+  { code: 'DXB', city: 'Дубай', country: 'ОАЭ', name: 'Международный аэропорт Дубай' },
+  { code: 'AUH', city: 'Абу-Даби', country: 'ОАЭ', name: 'Аэропорт Абу-Даби' },
+  { code: 'SHJ', city: 'Шарджа', country: 'ОАЭ', name: 'Аэропорт Шарджа' },
+  // Азия
+  { code: 'BKK', city: 'Бангкок', country: 'Таиланд', name: 'Суварнабхуми' },
+  { code: 'HKT', city: 'Пхукет', country: 'Таиланд', name: 'Аэропорт Пхукет' },
+  { code: 'KUL', city: 'Куала-Лумпур', country: 'Малайзия', name: 'KLIA' },
+  { code: 'SIN', city: 'Сингапур', country: 'Сингапур', name: 'Чанги' },
+  { code: 'HAN', city: 'Ханой', country: 'Вьетнам', name: 'Ной Бай' },
+  { code: 'SGN', city: 'Хошимин', country: 'Вьетнам', name: 'Таншоннят' },
+  { code: 'DEL', city: 'Дели', country: 'Индия', name: 'Индира Ганди' },
+  { code: 'BOM', city: 'Мумбаи', country: 'Индия', name: 'Чатрапати Шиваджи' },
+  { code: 'PEK', city: 'Пекин', country: 'Китай', name: 'Столичный аэропорт' },
+  { code: 'PVG', city: 'Шанхай', country: 'Китай', name: 'Пудун' },
+  { code: 'CAN', city: 'Гуанчжоу', country: 'Китай', name: 'Байюнь' },
+  { code: 'HKG', city: 'Гонконг', country: 'Гонконг', name: 'Чхеклапкок' },
+  { code: 'ICN', city: 'Сеул', country: 'Южная Корея', name: 'Инчхон' },
+  { code: 'NRT', city: 'Токио', country: 'Япония', name: 'Нарита' },
+  { code: 'HND', city: 'Токио', country: 'Япония', name: 'Ханеда' },
+  // Ближний Восток
+  { code: 'DOH', city: 'Доха', country: 'Катар', name: 'Хамад' },
+  { code: 'RUH', city: 'Эр-Рияд', country: 'Саудовская Аравия', name: 'Кинг Халид' },
+  { code: 'JED', city: 'Джидда', country: 'Саудовская Аравия', name: 'Кинг Абдулазиз' },
+  { code: 'TLV', city: 'Тель-Авив', country: 'Израиль', name: 'Бен-Гурион' },
+  { code: 'AMM', city: 'Амман', country: 'Иордания', name: 'Королева Алия' },
+  { code: 'CAI', city: 'Каир', country: 'Египет', name: 'Каир' },
+  { code: 'SSH', city: 'Шарм-эль-Шейх', country: 'Египет', name: 'Шарм-эль-Шейх' },
+  { code: 'HRG', city: 'Хургада', country: 'Египет', name: 'Хургада' },
+  // Европа
+  { code: 'LHR', city: 'Лондон', country: 'Великобритания', name: 'Хитроу' },
+  { code: 'CDG', city: 'Париж', country: 'Франция', name: 'Шарль де Голль' },
+  { code: 'FRA', city: 'Франкфурт', country: 'Германия', name: 'Франкфурт' },
+  { code: 'MUC', city: 'Мюнхен', country: 'Германия', name: 'Мюнхен' },
+  { code: 'FCO', city: 'Рим', country: 'Италия', name: 'Фьюмичино' },
+  { code: 'MXP', city: 'Милан', country: 'Италия', name: 'Мальпенса' },
+  { code: 'BCN', city: 'Барселона', country: 'Испания', name: 'Эль-Прат' },
+  { code: 'MAD', city: 'Мадрид', country: 'Испания', name: 'Барахас' },
+  { code: 'AMS', city: 'Амстердам', country: 'Нидерланды', name: 'Схипхол' },
+  { code: 'VIE', city: 'Вена', country: 'Австрия', name: 'Швехат' },
+  { code: 'ZRH', city: 'Цюрих', country: 'Швейцария', name: 'Цюрих' },
+  { code: 'PRG', city: 'Прага', country: 'Чехия', name: 'Вацлав Гавел' },
+  { code: 'WAW', city: 'Варшава', country: 'Польша', name: 'Шопен' },
+  { code: 'ATH', city: 'Афины', country: 'Греция', name: 'Элефтериос Венизелос' },
+  // Америка
+  { code: 'JFK', city: 'Нью-Йорк', country: 'США', name: 'Кеннеди' },
+  { code: 'LAX', city: 'Лос-Анджелес', country: 'США', name: 'LAX' },
+  { code: 'MIA', city: 'Майами', country: 'США', name: 'Майами' },
+  { code: 'ORD', city: 'Чикаго', country: 'США', name: "О'Хара" }
+];
+
+function searchAirports(field, query) {
+  const listId = field === 'from' ? 'aviaFromList' : 'aviaToList';
+  const list = document.getElementById(listId);
   
-  // Проверяем, есть ли значение в обоих списках
-  const fromOptions = Array.from(from.options).map(o => o.value);
-  const toOptions = Array.from(to.options).map(o => o.value);
-  
-  if (toOptions.includes(fromVal) && fromOptions.includes(toVal)) {
-    from.value = toVal;
-    to.value = fromVal;
-    showToast('⇄ Города поменялись', 'green');
+  if (!query || query.length < 1) {
+    list.classList.remove('show');
+    return;
   }
+  
+  const q = query.toLowerCase();
+  const results = AIRPORTS.filter(a => 
+    a.city.toLowerCase().includes(q) || 
+    a.code.toLowerCase().includes(q) ||
+    a.country.toLowerCase().includes(q) ||
+    a.name.toLowerCase().includes(q)
+  ).slice(0, 8);
+  
+  if (results.length === 0) {
+    list.classList.remove('show');
+    return;
+  }
+  
+  list.innerHTML = results.map(a => `
+    <div class="autocomplete-item" onclick="selectAirport('${field}', '${a.code}', '${a.city}')">
+      <div>
+        <div class="city">${a.city}</div>
+        <div class="country">${a.country} • ${a.name}</div>
+      </div>
+      <span class="code">${a.code}</span>
+    </div>
+  `).join('');
+  
+  list.classList.add('show');
+}
+
+function selectAirport(field, code, city) {
+  if (field === 'from') {
+    document.getElementById('aviaFrom').value = code;
+    document.getElementById('aviaFromInput').value = city;
+    document.getElementById('aviaFromList').classList.remove('show');
+  } else {
+    document.getElementById('aviaTo').value = code;
+    document.getElementById('aviaToInput').value = city;
+    document.getElementById('aviaToList').classList.remove('show');
+  }
+}
+
+function swapCities() {
+  const fromCode = document.getElementById('aviaFrom').value;
+  const toCode = document.getElementById('aviaTo').value;
+  const fromInput = document.getElementById('aviaFromInput').value;
+  const toInput = document.getElementById('aviaToInput').value;
+  
+  document.getElementById('aviaFrom').value = toCode;
+  document.getElementById('aviaTo').value = fromCode;
+  document.getElementById('aviaFromInput').value = toInput;
+  document.getElementById('aviaToInput').value = fromInput;
+  
+  showToast('⇄ Города поменялись', 'green');
 }
 
 function formatDateForAviasales(dateStr) {
@@ -1957,6 +2187,12 @@ function formatDateForAviasales(dateStr) {
 function searchAviasales() {
   const from = document.getElementById('aviaFrom').value;
   const to = document.getElementById('aviaTo').value;
+  
+  if (!from || !to) {
+    showToast('Выберите города', 'red');
+    return;
+  }
+  
   const passengers = document.getElementById('aviaPassengers').value;
   const isRoundtrip = document.querySelector('input[name="tripType"]:checked').value === 'roundtrip';
   
@@ -1964,7 +2200,6 @@ function searchAviasales() {
   const dateReturn = isRoundtrip ? formatDateForAviasales(document.getElementById('aviaDateReturn').value) : '';
   
   // Формируем URL Aviasales
-  // Формат: /search/FROM{date}TO{returnDate}{passengers}
   let url;
   if (isRoundtrip && dateReturn) {
     url = `https://www.aviasales.ru/search/${from}${dateDepart}${to}${dateReturn}${passengers}`;
@@ -1976,7 +2211,14 @@ function searchAviasales() {
   showToast('✈️ Открыт поиск на Aviasales', 'green');
 }
 
-// Установка даты по умолчанию (завтра)
+// Закрытие автодополнения при клике вне
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.aviasales-autocomplete')) {
+    document.querySelectorAll('.autocomplete-list').forEach(l => l.classList.remove('show'));
+  }
+});
+
+// Установка дат и городов по умолчанию
 document.addEventListener('DOMContentLoaded', function() {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -1992,6 +2234,12 @@ document.addEventListener('DOMContentLoaded', function() {
   if (aviaDateReturn) {
     aviaDateReturn.value = returnDate.toISOString().split('T')[0];
   }
+  
+  // Города по умолчанию
+  const fromInput = document.getElementById('aviaFromInput');
+  const toInput = document.getElementById('aviaToInput');
+  if (fromInput) fromInput.value = 'Ташкент';
+  if (toInput) toInput.value = 'Самарканд';
 });
 
 // ============================================
