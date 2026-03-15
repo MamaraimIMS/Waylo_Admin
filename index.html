@@ -986,6 +986,11 @@ function switchSection(section) {
   document.getElementById('sectionTitle').textContent = cfg.title;
   document.getElementById('sectionBadge').textContent = cfg.badge;
   
+  // Сброс фильтров при переключении
+  document.getElementById('searchInput').value = '';
+  document.getElementById('filterCity').value = '';
+  document.getElementById('filterStatus').value = '';
+  
   // Проверяем, это виджет или обычный раздел
   if (cfg.isWidget) {
     // Скрываем таблицу, показываем виджет
@@ -994,7 +999,8 @@ function switchSection(section) {
     
     // Скрываем элементы управления
     document.querySelector('.toolbar').style.display = 'none';
-    document.querySelector('.stats-row').style.display = 'none';
+    document.querySelector('.stats').style.display = 'none';
+    document.getElementById('addBtn').style.display = 'none';
     
     return;
   }
@@ -1003,7 +1009,8 @@ function switchSection(section) {
   document.getElementById('tableWrap').style.display = 'block';
   document.getElementById('widgetWrap').style.display = 'none';
   document.querySelector('.toolbar').style.display = 'flex';
-  document.querySelector('.stats-row').style.display = 'flex';
+  document.querySelector('.stats').style.display = 'grid';
+  document.getElementById('addBtn').style.display = 'block';
   
   // Обновление статистики
   document.getElementById('statActiveLabel').textContent = cfg.hasApprove ? 'Approved' : 'Активных';
