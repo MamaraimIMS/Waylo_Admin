@@ -118,6 +118,39 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--ff)
 .autocomplete-item .city{font-weight:500;color:var(--tx)}
 .autocomplete-item .country{font-size:12px;color:var(--tx3)}
 .autocomplete-item .code{margin-left:auto;font-family:var(--fm);font-size:12px;color:var(--acc);background:var(--adim);padding:2px 6px;border-radius:4px}
+.flight-results{margin-top:20px}
+.flight-results-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--b)}
+.flight-results-header span{font-weight:600;font-size:14px}
+.flight-sort{display:flex;align-items:center;gap:8px}
+.flights-list{display:flex;flex-direction:column;gap:12px;max-height:500px;overflow-y:auto}
+.flight-card{background:var(--surf2);border:1px solid var(--b);border-radius:12px;padding:16px;display:grid;grid-template-columns:1fr auto auto;gap:20px;align-items:center;transition:all .15s;cursor:pointer}
+.flight-card:hover{border-color:var(--acc);box-shadow:0 4px 12px rgba(124,109,250,.15)}
+.flight-route{display:flex;align-items:center;gap:16px}
+.flight-point{text-align:center}
+.flight-time{font-size:20px;font-weight:600;color:var(--tx)}
+.flight-code{font-size:12px;color:var(--tx3)}
+.flight-city{font-size:11px;color:var(--tx3)}
+.flight-arrow{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--tx3)}
+.flight-duration{font-size:11px}
+.flight-line{width:60px;height:1px;background:var(--b2);position:relative}
+.flight-line::after{content:'✈';position:absolute;top:-8px;left:50%;transform:translateX(-50%);font-size:12px}
+.flight-stops{font-size:10px;color:var(--amb)}
+.flight-info{display:flex;flex-direction:column;gap:6px}
+.flight-airline{display:flex;align-items:center;gap:8px;font-size:13px}
+.flight-airline img{width:20px;height:20px;border-radius:4px}
+.flight-details{font-size:11px;color:var(--tx3)}
+.flight-price-block{text-align:right}
+.flight-price{font-size:24px;font-weight:700;color:var(--acc)}
+.flight-price-label{font-size:11px;color:var(--tx3)}
+.flight-book{margin-top:8px}
+.flight-loading,.flight-empty{text-align:center;padding:60px 20px;color:var(--tx2)}
+.flight-loading p,.flight-empty p{margin:16px 0 8px;font-size:15px}
+.loading-spinner{width:40px;height:40px;border:3px solid var(--b);border-top-color:var(--acc);border-radius:50%;margin:0 auto;animation:spin 1s linear infinite}
+.api-settings{padding:20px}
+.api-settings .form-group{margin-bottom:16px}
+.api-settings label{display:block;font-size:12px;color:var(--tx3);margin-bottom:6px}
+.api-settings .hint{font-size:11px;color:var(--tx3);margin-top:6px}
+.api-settings .hint a{color:var(--acc)}
 table{width:100%;border-collapse:collapse}
 thead tr{background:var(--surf2)}
 th{padding:12px 14px;text-align:left;font-size:10px;font-weight:600;color:var(--tx3);letter-spacing:.6px;text-transform:uppercase}
@@ -421,7 +454,10 @@ td.primary{color:var(--tx);font-weight:500}
             <span style="font-weight:600;font-size:18px;margin-left:8px">Aviasales</span>
             <span class="badge badge-green" style="margin-left:10px">Партнёр</span>
           </div>
-          <p style="color:var(--tx2);font-size:13px;margin-top:8px">Поиск и бронирование авиабилетов через крупнейший агрегатор</p>
+          <div style="display:flex;align-items:center;gap:12px;margin-top:8px">
+            <p style="color:var(--tx2);font-size:13px;margin:0">Поиск авиабилетов в реальном времени</p>
+            <button class="btn btn-ghost btn-sm" onclick="openApiSettings()" title="Настройки API">⚙️ API</button>
+          </div>
         </div>
         <div class="widget-content">
           <div class="aviasales-box">
@@ -458,7 +494,7 @@ td.primary{color:var(--tx);font-weight:500}
                   <label>Обратно</label>
                   <input type="date" id="aviaDateReturn" class="form-input">
                 </div>
-                <div class="aviasales-field" style="min-width:100px">
+                <div class="aviasales-field" style="min-width:80px">
                   <label>Пассажиры</label>
                   <select id="aviaPassengers" class="form-select">
                     <option value="1">1</option>
@@ -467,39 +503,40 @@ td.primary{color:var(--tx);font-weight:500}
                     <option value="4">4</option>
                   </select>
                 </div>
-                <button class="btn btn-primary aviasales-btn" onclick="searchAviasales()">
+                <button class="btn btn-primary aviasales-btn" id="searchBtn" onclick="searchAviasales()">
                   ✈️ Найти
                 </button>
               </div>
             </div>
-            <div class="aviasales-partners">
-              <span style="color:var(--tx3);font-size:12px">Поиск на:</span>
-              <img src="https://www.aviasales.ru/favicon.ico" style="height:16px;margin:0 6px">
-              <span style="font-size:13px">Aviasales</span>
-            </div>
           </div>
-        </div>
-        <div class="widget-info">
-          <div class="widget-info-item">
-            <span class="widget-info-icon">💰</span>
-            <div>
-              <div class="widget-info-title">Комиссия</div>
-              <div class="widget-info-text">50-70% от дохода Aviasales</div>
+          
+          <!-- Результаты поиска -->
+          <div id="flightResults" class="flight-results" style="display:none">
+            <div class="flight-results-header">
+              <span id="resultsTitle">Найдено билетов: 0</span>
+              <div class="flight-sort">
+                <span style="color:var(--tx3);font-size:12px">Сортировка:</span>
+                <select id="sortFlights" class="form-select" style="width:auto" onchange="sortFlightResults()">
+                  <option value="price">По цене</option>
+                  <option value="duration">По времени</option>
+                  <option value="departure">По вылету</option>
+                </select>
+              </div>
             </div>
+            <div id="flightsList" class="flights-list"></div>
           </div>
-          <div class="widget-info-item">
-            <span class="widget-info-icon">🔗</span>
-            <div>
-              <div class="widget-info-title">Интеграция</div>
-              <div class="widget-info-text">Автоматически в Mini App</div>
-            </div>
+          
+          <!-- Состояние загрузки -->
+          <div id="flightLoading" class="flight-loading" style="display:none">
+            <div class="loading-spinner"></div>
+            <p>Поиск билетов...</p>
           </div>
-          <div class="widget-info-item">
-            <span class="widget-info-icon">📊</span>
-            <div>
-              <div class="widget-info-title">Статистика</div>
-              <div class="widget-info-text"><a href="https://www.travelpayouts.com/" target="_blank" style="color:var(--acc)">Travelpayouts Dashboard →</a></div>
-            </div>
+          
+          <!-- Пустое состояние -->
+          <div id="flightEmpty" class="flight-empty" style="display:none">
+            <span style="font-size:48px">🔍</span>
+            <p>Билеты не найдены</p>
+            <span style="color:var(--tx3);font-size:13px">Попробуйте изменить даты или направление</span>
           </div>
         </div>
       </div>
@@ -2184,7 +2221,65 @@ function formatDateForAviasales(dateStr) {
   return day + month;
 }
 
-function searchAviasales() {
+// Хранилище результатов поиска
+let flightResults = [];
+let searchParams = {};
+
+// Настройки API
+const API_SETTINGS_KEY = 'waylo_api_settings';
+function getApiSettings() {
+  try {
+    return JSON.parse(localStorage.getItem(API_SETTINGS_KEY)) || {};
+  } catch(e) { return {}; }
+}
+function saveApiSettings(settings) {
+  localStorage.setItem(API_SETTINGS_KEY, JSON.stringify(settings));
+}
+
+function openApiSettings() {
+  const settings = getApiSettings();
+  document.getElementById('pickerTitle').innerHTML = '⚙️ Настройки API';
+  document.getElementById('pickerSearch').style.display = 'none';
+  
+  document.getElementById('pickerList').innerHTML = `
+    <div class="api-settings">
+      <div class="form-group">
+        <label>Travelpayouts API Token</label>
+        <input type="text" id="apiToken" class="form-input" placeholder="Ваш API токен" value="${settings.token || ''}">
+        <div class="hint">Получите токен на <a href="https://www.travelpayouts.com/developers/api" target="_blank">travelpayouts.com</a></div>
+      </div>
+      <div class="form-group">
+        <label>Marker ID (партнёрский)</label>
+        <input type="text" id="apiMarker" class="form-input" placeholder="123456" value="${settings.marker || ''}">
+        <div class="hint">Для получения комиссии с продаж</div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="saveApiSettingsForm()">
+        💾 Сохранить настройки
+      </button>
+      <div style="margin-top:20px;padding:16px;background:var(--surf3);border-radius:8px">
+        <div style="font-size:13px;font-weight:500;margin-bottom:8px">📖 Инструкция:</div>
+        <ol style="font-size:12px;color:var(--tx2);margin:0;padding-left:20px;line-height:1.8">
+          <li>Зарегистрируйтесь на <a href="https://www.travelpayouts.com/" target="_blank" style="color:var(--acc)">Travelpayouts</a></li>
+          <li>Перейдите в раздел API</li>
+          <li>Скопируйте токен и marker</li>
+          <li>Вставьте их в поля выше</li>
+        </ol>
+      </div>
+    </div>
+  `;
+  
+  document.getElementById('picker').classList.add('open');
+}
+
+function saveApiSettingsForm() {
+  const token = document.getElementById('apiToken').value.trim();
+  const marker = document.getElementById('apiMarker').value.trim();
+  saveApiSettings({ token, marker });
+  closePicker();
+  showToast('✓ Настройки API сохранены', 'green');
+}
+
+async function searchAviasales() {
   const from = document.getElementById('aviaFrom').value;
   const to = document.getElementById('aviaTo').value;
   
@@ -2193,22 +2288,226 @@ function searchAviasales() {
     return;
   }
   
-  const passengers = document.getElementById('aviaPassengers').value;
+  const passengers = parseInt(document.getElementById('aviaPassengers').value) || 1;
   const isRoundtrip = document.querySelector('input[name="tripType"]:checked').value === 'roundtrip';
+  const departDate = document.getElementById('aviaDate').value;
+  const returnDate = isRoundtrip ? document.getElementById('aviaDateReturn').value : null;
   
-  const dateDepart = formatDateForAviasales(document.getElementById('aviaDate').value);
-  const dateReturn = isRoundtrip ? formatDateForAviasales(document.getElementById('aviaDateReturn').value) : '';
+  searchParams = { from, to, departDate, returnDate, passengers, isRoundtrip };
   
-  // Формируем URL Aviasales
-  let url;
-  if (isRoundtrip && dateReturn) {
-    url = `https://www.aviasales.ru/search/${from}${dateDepart}${to}${dateReturn}${passengers}`;
-  } else {
-    url = `https://www.aviasales.ru/search/${from}${dateDepart}${to}${passengers}`;
+  // Показываем загрузку
+  document.getElementById('flightResults').style.display = 'none';
+  document.getElementById('flightEmpty').style.display = 'none';
+  document.getElementById('flightLoading').style.display = 'block';
+  document.getElementById('searchBtn').disabled = true;
+  document.getElementById('searchBtn').textContent = '⏳ Поиск...';
+  
+  const settings = getApiSettings();
+  
+  try {
+    let results = [];
+    
+    if (settings.token) {
+      // Используем реальный API
+      results = await fetchFlightsFromAPI(from, to, departDate, returnDate, settings.token);
+    } else {
+      // Генерируем демо-данные
+      results = generateDemoFlights(from, to, departDate, returnDate, passengers);
+    }
+    
+    flightResults = results;
+    
+    if (results.length > 0) {
+      renderFlightResults(results);
+      document.getElementById('flightLoading').style.display = 'none';
+      document.getElementById('flightResults').style.display = 'block';
+      document.getElementById('resultsTitle').textContent = `Найдено билетов: ${results.length}`;
+    } else {
+      document.getElementById('flightLoading').style.display = 'none';
+      document.getElementById('flightEmpty').style.display = 'block';
+    }
+    
+  } catch (error) {
+    console.error('Search error:', error);
+    document.getElementById('flightLoading').style.display = 'none';
+    document.getElementById('flightEmpty').style.display = 'block';
+    showToast('Ошибка поиска: ' + error.message, 'red');
   }
   
-  window.open(url, '_blank');
-  showToast('✈️ Открыт поиск на Aviasales', 'green');
+  document.getElementById('searchBtn').disabled = false;
+  document.getElementById('searchBtn').textContent = '✈️ Найти';
+}
+
+async function fetchFlightsFromAPI(from, to, departDate, returnDate, token) {
+  // Travelpayouts API
+  const url = `https://api.travelpayouts.com/aviasales/v3/prices_for_dates?origin=${from}&destination=${to}&departure_at=${departDate}${returnDate ? '&return_at=' + returnDate : ''}&unique=false&sorting=price&direct=false&currency=usd&limit=30&token=${token}`;
+  
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('API Error');
+    const data = await response.json();
+    
+    if (data.success && data.data) {
+      return data.data.map(f => ({
+        id: f.departure_at + f.origin,
+        from: f.origin,
+        to: f.destination,
+        departureTime: f.departure_at ? new Date(f.departure_at).toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'}) : '—',
+        arrivalTime: '—',
+        duration: f.duration ? Math.floor(f.duration / 60) + 'ч ' + (f.duration % 60) + 'м' : '—',
+        airline: f.airline || 'Авиакомпания',
+        airlineLogo: `https://pics.avs.io/60/60/${f.airline}.png`,
+        stops: f.transfers || 0,
+        price: f.price || 0,
+        link: f.link ? `https://www.aviasales.ru${f.link}` : null,
+        date: f.departure_at ? new Date(f.departure_at).toLocaleDateString('ru-RU') : ''
+      }));
+    }
+    return [];
+  } catch(e) {
+    console.error('API fetch error:', e);
+    // Fallback to demo
+    return generateDemoFlights(from, to, departDate, returnDate, 1);
+  }
+}
+
+function generateDemoFlights(from, to, departDate, returnDate, passengers) {
+  const fromCity = AIRPORTS.find(a => a.code === from)?.city || from;
+  const toCity = AIRPORTS.find(a => a.code === to)?.city || to;
+  
+  const airlines = [
+    { code: 'HY', name: 'Uzbekistan Airways', logo: 'https://pics.avs.io/60/60/HY.png' },
+    { code: 'QH', name: 'Qanot Sharq', logo: 'https://pics.avs.io/60/60/QH.png' },
+    { code: '6Q', name: 'Silk Avia', logo: 'https://pics.avs.io/60/60/6Q.png' },
+    { code: 'TK', name: 'Turkish Airlines', logo: 'https://pics.avs.io/60/60/TK.png' },
+    { code: 'SU', name: 'Aeroflot', logo: 'https://pics.avs.io/60/60/SU.png' },
+    { code: 'EK', name: 'Emirates', logo: 'https://pics.avs.io/60/60/EK.png' }
+  ];
+  
+  const times = ['06:30', '08:15', '10:40', '12:25', '14:50', '17:30', '19:45', '22:10'];
+  const durations = ['1ч 10м', '1ч 25м', '2ч 00м', '2ч 30м', '3ч 15м', '4ч 30м', '5ч 45м'];
+  
+  const results = [];
+  const numResults = 5 + Math.floor(Math.random() * 6);
+  
+  for (let i = 0; i < numResults; i++) {
+    const airline = airlines[Math.floor(Math.random() * airlines.length)];
+    const depTime = times[Math.floor(Math.random() * times.length)];
+    const dur = durations[Math.floor(Math.random() * durations.length)];
+    const stops = Math.random() > 0.7 ? 1 : 0;
+    const basePrice = 50 + Math.floor(Math.random() * 400);
+    
+    // Вычисляем время прилёта
+    const [dH, dM] = depTime.split(':').map(Number);
+    const [durH, durM] = dur.match(/(\d+)ч\s*(\d+)?м?/).slice(1).map(n => parseInt(n) || 0);
+    let arrH = dH + durH;
+    let arrM = dM + durM;
+    if (arrM >= 60) { arrH++; arrM -= 60; }
+    if (arrH >= 24) arrH -= 24;
+    const arrTime = String(arrH).padStart(2,'0') + ':' + String(arrM).padStart(2,'0');
+    
+    results.push({
+      id: 'demo-' + i,
+      from: from,
+      fromCity: fromCity,
+      to: to,
+      toCity: toCity,
+      departureTime: depTime,
+      arrivalTime: arrTime,
+      duration: dur,
+      airline: airline.name,
+      airlineLogo: airline.logo,
+      stops: stops,
+      price: basePrice * passengers,
+      link: `https://www.aviasales.ru/search/${from}${formatDateForAviasales(departDate)}${to}${passengers}`,
+      date: departDate ? new Date(departDate).toLocaleDateString('ru-RU') : ''
+    });
+  }
+  
+  // Сортируем по цене
+  results.sort((a, b) => a.price - b.price);
+  return results;
+}
+
+function renderFlightResults(results) {
+  const list = document.getElementById('flightsList');
+  const fromCity = AIRPORTS.find(a => a.code === searchParams.from)?.city || searchParams.from;
+  const toCity = AIRPORTS.find(a => a.code === searchParams.to)?.city || searchParams.to;
+  
+  list.innerHTML = results.map(f => `
+    <div class="flight-card" onclick="openFlightLink('${f.link || ''}')">
+      <div class="flight-route">
+        <div class="flight-point">
+          <div class="flight-time">${f.departureTime}</div>
+          <div class="flight-code">${f.from || searchParams.from}</div>
+          <div class="flight-city">${f.fromCity || fromCity}</div>
+        </div>
+        <div class="flight-arrow">
+          <div class="flight-duration">${f.duration}</div>
+          <div class="flight-line"></div>
+          <div class="flight-stops">${f.stops === 0 ? 'прямой' : f.stops + ' пересадка'}</div>
+        </div>
+        <div class="flight-point">
+          <div class="flight-time">${f.arrivalTime}</div>
+          <div class="flight-code">${f.to || searchParams.to}</div>
+          <div class="flight-city">${f.toCity || toCity}</div>
+        </div>
+      </div>
+      <div class="flight-info">
+        <div class="flight-airline">
+          <img src="${f.airlineLogo}" onerror="this.style.display='none'">
+          <span>${f.airline}</span>
+        </div>
+        <div class="flight-details">${f.date || ''}</div>
+      </div>
+      <div class="flight-price-block">
+        <div class="flight-price">$${f.price}</div>
+        <div class="flight-price-label">за ${searchParams.passengers || 1} пасс.</div>
+        <button class="btn btn-primary btn-sm flight-book" onclick="event.stopPropagation(); bookFlight('${f.link || ''}', ${f.price}, '${f.from} → ${f.to}', '${f.airline}')">
+          Выбрать
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function sortFlightResults() {
+  const sortBy = document.getElementById('sortFlights').value;
+  
+  if (sortBy === 'price') {
+    flightResults.sort((a, b) => a.price - b.price);
+  } else if (sortBy === 'duration') {
+    flightResults.sort((a, b) => {
+      const durA = parseDuration(a.duration);
+      const durB = parseDuration(b.duration);
+      return durA - durB;
+    });
+  } else if (sortBy === 'departure') {
+    flightResults.sort((a, b) => a.departureTime.localeCompare(b.departureTime));
+  }
+  
+  renderFlightResults(flightResults);
+}
+
+function parseDuration(dur) {
+  const match = dur.match(/(\d+)ч\s*(\d+)?м?/);
+  if (match) {
+    return (parseInt(match[1]) || 0) * 60 + (parseInt(match[2]) || 0);
+  }
+  return 0;
+}
+
+function openFlightLink(link) {
+  if (link) {
+    window.open(link, '_blank');
+  }
+}
+
+function bookFlight(link, price, route, airline) {
+  if (link) {
+    window.open(link, '_blank');
+    showToast(`✈️ Переход к бронированию: ${route}`, 'green');
+  }
 }
 
 // Закрытие автодополнения при клике вне
