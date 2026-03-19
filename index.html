@@ -78,6 +78,8 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--ff)
 .btn-primary:hover{background:var(--acc2)}
 .btn-success{background:rgba(34,197,94,.12);color:var(--grn);border-color:rgba(34,197,94,.25)}
 .btn-success:hover{background:rgba(34,197,94,.2)}
+.btn-amber{background:rgba(245,158,11,.12);color:var(--amb);border-color:rgba(245,158,11,.25)}
+.btn-amber:hover{background:rgba(245,158,11,.2)}
 .btn-danger{background:rgba(239,68,68,.1);color:var(--red);border-color:rgba(239,68,68,.2)}
 .btn-ghost{background:var(--surf2);color:var(--tx2);border-color:var(--b)}
 .btn-ghost:hover{background:var(--surf3);color:var(--tx)}
@@ -165,6 +167,9 @@ td.primary{color:var(--tx);font-weight:500}
 .badge-gray{background:rgba(90,90,114,.12);color:var(--tx3)}
 .badge-sky{background:rgba(56,189,248,.12);color:var(--sky)}
 .badge-pink{background:rgba(244,114,182,.12);color:var(--pink)}
+.badge-blue{background:rgba(59,130,246,.12);color:#3b82f6}
+.badge-red{background:rgba(239,68,68,.12);color:var(--red)}
+.badge-purple{background:rgba(139,92,246,.12);color:#8b5cf6}
 .price{font-family:var(--fm);color:var(--grn);font-weight:500}
 .actions{display:flex;gap:6px;position:relative;z-index:10}
 .actions button{position:relative;z-index:11}
@@ -412,6 +417,16 @@ td.primary{color:var(--tx);font-weight:500}
     <div class="ni" data-sec="guides" onclick="switchSection('guides')">
       <span class="ni-ico">👤</span>Гиды
       <span class="ni-cnt" id="cnt-guides">0</span>
+    </div>
+    <div class="ni" data-sec="drivers" onclick="switchSection('drivers')">
+      <span class="ni-ico">🚘</span>Водители
+      <span class="ni-cnt" id="cnt-drivers">0</span>
+    </div>
+    
+    <div class="sb-sec">CRM</div>
+    <div class="ni" data-sec="requests" onclick="switchSection('requests')">
+      <span class="ni-ico">📋</span>Заявки
+      <span class="ni-cnt" id="cnt-requests">0</span>
     </div>
     
     <div class="sb-foot">
@@ -881,6 +896,56 @@ const SECTIONS = {
       { key: 'experience_years', label: 'Опыт (лет)', type: 'number' },
       { key: 'active', label: 'Активен', type: 'boolean' }
     ]
+  },
+  drivers: {
+    title: 'Водители',
+    badge: 'Каталог',
+    priceField: 'price_day',
+    columns: ['gallery', 'name', 'city', 'vehicle', 'vehicle_number', 'price_day', 'active'],
+    columnLabels: { gallery: '', name: 'Имя', city: 'Город', vehicle: 'Транспорт', vehicle_number: 'Номер', price_day: 'Цена/день', active: 'Статус' },
+    fields: [
+      { key: 'name', label: 'ФИО', type: 'text', required: true, placeholder: 'Иванов Иван Иванович' },
+      { key: 'gallery', label: 'Фото (водитель + авто)', type: 'gallery' },
+      { key: 'city', label: 'Город', type: 'city' },
+      { key: 'phone', label: 'Телефон', type: 'text', placeholder: '+998 90 123 45 67' },
+      { key: 'vehicle', label: 'Транспорт', type: 'select', options: ['седан', 'минивэн', 'внедорожник', 'микроавтобус', 'автобус'] },
+      { key: 'vehicle_model', label: 'Марка/модель', type: 'text', placeholder: 'Chevrolet Malibu' },
+      { key: 'vehicle_number', label: 'Гос. номер', type: 'text', placeholder: '01 A 123 AB' },
+      { key: 'vehicle_year', label: 'Год выпуска', type: 'number', placeholder: '2022' },
+      { key: 'license_number', label: 'Номер лицензии', type: 'text' },
+      { key: 'languages', label: 'Языки', type: 'text', placeholder: 'русский, узбекский' },
+      { key: 'price_day', label: 'Цена за день ($)', type: 'number' },
+      { key: 'price_hour', label: 'Цена за час ($)', type: 'number' },
+      { key: 'rating', label: 'Рейтинг', type: 'number' },
+      { key: 'experience_years', label: 'Стаж (лет)', type: 'number' },
+      { key: 'notes', label: 'Заметки', type: 'textarea', placeholder: 'Дополнительная информация' },
+      { key: 'active', label: 'Активен', type: 'boolean' }
+    ]
+  },
+  requests: {
+    title: 'Заявки',
+    badge: 'CRM',
+    hasStatus: true,
+    columns: ['request_number', 'client_name', 'phone', 'tour_name', 'travel_date', 'total_price', 'status'],
+    columnLabels: { request_number: '№', client_name: 'Клиент', phone: 'Телефон', tour_name: 'Тур', travel_date: 'Дата', total_price: 'Сумма', status: 'Статус' },
+    fields: [
+      { key: 'request_number', label: 'Номер заявки', type: 'text', required: true, placeholder: 'REQ-001' },
+      { key: 'client_name', label: 'Имя клиента', type: 'text', required: true },
+      { key: 'phone', label: 'Телефон', type: 'text', placeholder: '+998 90 123 45 67' },
+      { key: 'email', label: 'Email', type: 'text' },
+      { key: 'telegram', label: 'Telegram', type: 'text', placeholder: '@username' },
+      { key: 'tour_name', label: 'Название тура', type: 'text' },
+      { key: 'destination', label: 'Направление', type: 'city' },
+      { key: 'travel_date', label: 'Дата поездки', type: 'date' },
+      { key: 'travelers_count', label: 'Кол-во туристов', type: 'number' },
+      { key: 'total_price', label: 'Сумма ($)', type: 'number' },
+      { key: 'paid_amount', label: 'Оплачено ($)', type: 'number' },
+      { key: 'status', label: 'Статус', type: 'select', options: ['новая', 'в работе', 'подтверждена', 'завершена', 'отменена'] },
+      { key: 'source', label: 'Источник', type: 'select', options: ['Telegram', 'Instagram', 'сайт', 'звонок', 'рекомендация'] },
+      { key: 'assigned_to', label: 'Ответственный', type: 'text' },
+      { key: 'notes', label: 'Заметки', type: 'textarea' },
+      { key: 'created_at', label: 'Дата создания', type: 'date' }
+    ]
   }
 };
 
@@ -897,10 +962,25 @@ let isConnected = false;
 // ============================================
 // SUPABASE API
 // ============================================
+// Кэш для GET запросов
+const requestCache = new Map();
+const CACHE_TTL = 30000; // 30 секунд
+
 async function supabaseRequest(table, options = {}) {
-  const { method = 'GET', body, query = '' } = options;
+  const { method = 'GET', body, query = '', timeout = 20000, retries = 2, silent = false } = options;
   
   const url = `${SUPABASE_URL}/rest/v1/${table}${query}`;
+  const cacheKey = method === 'GET' ? `${table}${query}` : null;
+  
+  // Проверяем кэш для GET запросов
+  if (cacheKey && requestCache.has(cacheKey)) {
+    const cached = requestCache.get(cacheKey);
+    if (Date.now() - cached.timestamp < CACHE_TTL) {
+      console.log(`[Supabase] Cache hit: ${table}`);
+      return cached.data;
+    }
+    requestCache.delete(cacheKey);
+  }
   
   const headers = {
     'apikey': SUPABASE_KEY,
@@ -911,33 +991,92 @@ async function supabaseRequest(table, options = {}) {
   
   console.log(`[Supabase] ${method} ${table}${query}`);
   
-  try {
-    const response = await fetch(url, {
-      method,
-      headers,
-      body: body ? JSON.stringify(body) : undefined
-    });
+  let lastError;
+  let lastStatus = 0;
+  
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
     
-    const responseText = await response.text();
-    console.log(`[Supabase] Response: ${response.status}`, responseText.substring(0, 200));
-    
-    if (!response.ok) {
-      throw new Error(`${response.status}: ${responseText}`);
-    }
-    
-    if (method === 'GET' || method === 'POST' || method === 'PATCH') {
-      try {
-        return responseText ? JSON.parse(responseText) : [];
-      } catch(e) {
-        console.warn('[Supabase] Empty or invalid JSON response');
-        return [];
+    try {
+      const response = await fetch(url, {
+        method,
+        headers,
+        body: body ? JSON.stringify(body) : undefined,
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      lastStatus = response.status;
+      
+      const responseText = await response.text();
+      console.log(`[Supabase] Response: ${response.status}`, responseText.substring(0, 100));
+      
+      if (!response.ok) {
+        // 404 - таблица не существует, не retry
+        if (response.status === 404 || response.status === 400) {
+          throw new Error(`Table "${table}" not found or invalid query`);
+        }
+        throw new Error(`${response.status}: ${responseText}`);
+      }
+      
+      let result = [];
+      if (method === 'GET' || method === 'POST' || method === 'PATCH') {
+        try {
+          result = responseText ? JSON.parse(responseText) : [];
+        } catch(e) {
+          console.warn('[Supabase] Empty or invalid JSON');
+          result = [];
+        }
+      } else {
+        result = true;
+      }
+      
+      // Кэшируем GET результаты
+      if (cacheKey && Array.isArray(result)) {
+        requestCache.set(cacheKey, { data: result, timestamp: Date.now() });
+      }
+      
+      return result;
+      
+    } catch (error) {
+      clearTimeout(timeoutId);
+      lastError = error;
+      
+      // Не retry для 404/400 ошибок
+      if (lastStatus === 404 || lastStatus === 400) {
+        break;
+      }
+      
+      if (error.name === 'AbortError') {
+        console.warn(`[Supabase] Timeout (${timeout}ms), attempt ${attempt + 1}/${retries + 1}`);
+        if (!silent) {
+          showToast(`Таймаут запроса, попытка ${attempt + 1}...`, 'warning');
+        }
+      } else {
+        console.error(`[Supabase] Error, attempt ${attempt + 1}:`, error.message);
+      }
+      
+      if (attempt < retries) {
+        const delay = 1000 * (attempt + 1);
+        console.log(`[Supabase] Retrying in ${delay}ms...`);
+        await new Promise(r => setTimeout(r, delay));
       }
     }
-    return true;
-  } catch (error) {
-    console.error('[Supabase] Error:', error);
-    throw error;
   }
+  
+  // Показываем toast только если не silent и это не 404
+  if (!silent && lastStatus !== 404 && lastStatus !== 400) {
+    showToast('Ошибка подключения к Supabase', 'error');
+  }
+  
+  throw lastError || new Error('Request failed');
+}
+
+// Очистка кэша
+function clearSupabaseCache() {
+  requestCache.clear();
+  console.log('[Supabase] Cache cleared');
 }
 
 // ============================================
@@ -996,13 +1135,20 @@ function logout() {
 // ИНИЦИАЛИЗАЦИЯ
 // ============================================
 async function initApp() {
-  // Загрузка счётчиков из Supabase
+  // Загрузка счётчиков из Supabase (silent - без toast)
   for (const section of Object.keys(SECTIONS)) {
     try {
-      const data = await supabaseRequest(section, { query: '?select=id' });
-      document.getElementById('cnt-' + section).textContent = data.length;
+      const cfg = SECTIONS[section];
+      // Пропускаем виджеты
+      if (cfg.isWidget) continue;
+      
+      const data = await supabaseRequest(section, { query: '?select=id', silent: true });
+      const cntEl = document.getElementById('cnt-' + section);
+      if (cntEl) cntEl.textContent = data.length;
     } catch (e) {
-      document.getElementById('cnt-' + section).textContent = '0';
+      const cntEl = document.getElementById('cnt-' + section);
+      if (cntEl) cntEl.textContent = '0';
+      console.log(`[Init] Table ${section} not found or empty`);
     }
   }
   
@@ -1074,7 +1220,7 @@ async function loadSectionData() {
   
   try {
     console.log('[Load] Loading section:', currentSection);
-    allData = await supabaseRequest(currentSection, { query: '?order=created_at.desc' });
+    allData = await supabaseRequest(currentSection, { query: '?order=created_at.desc', silent: true });
     console.log('[Load] Loaded records:', allData.length);
     
     if (!Array.isArray(allData)) {
@@ -1090,21 +1236,26 @@ async function loadSectionData() {
     document.getElementById('tableStatus').textContent = '✓ Синхронизировано';
   } catch (error) {
     console.error('[Load] Error:', error);
+    allData = [];
+    
+    // Проверяем - это ошибка "таблица не найдена" или другая
+    const isNotFound = error.message && (error.message.includes('not found') || error.message.includes('404') || error.message.includes('400'));
+    
     document.getElementById('tableBody').innerHTML = `
       <tr><td colspan="${cfg.columns.length + 1}">
         <div class="empty">
-          <div class="empty-icon">⚠️</div>
-          <p>Ошибка загрузки</p>
-          <p style="font-size:12px;color:var(--tx3)">${error.message}</p>
+          <div class="empty-icon">${isNotFound ? '📋' : '⚠️'}</div>
+          <p>${isNotFound ? 'Таблица не создана' : 'Ошибка загрузки'}</p>
+          <p style="font-size:12px;color:var(--tx3)">${isNotFound ? `Таблица "${currentSection}" не найдена в Supabase` : error.message}</p>
           <p style="font-size:11px;color:var(--tx3);margin-top:10px">
-            Проверьте:<br>
-            1. Таблица "${currentSection}" существует в Supabase<br>
-            2. RLS политики настроены правильно<br>
-            3. API ключ верный
+            ${isNotFound ? 
+              `Создайте таблицу в <a href="https://supabase.com/dashboard" target="_blank" style="color:var(--acc)">Supabase Dashboard</a> → SQL Editor` :
+              `Проверьте подключение к Supabase`
+            }
           </p>
         </div>
       </td></tr>`;
-    document.getElementById('tableStatus').textContent = '❌ Ошибка';
+    document.getElementById('tableStatus').textContent = isNotFound ? '📋 Нет таблицы' : '❌ Ошибка';
   }
 }
 
@@ -1168,9 +1319,21 @@ function renderTable() {
   } else {
     document.getElementById('tableBody').innerHTML = filteredData.map(row => {
       const cells = columns.map(col => renderCell(col, row[col], row)).join('');
-      const approveBtn = cfg.hasApprove && !row.approved 
-        ? `<button class="btn btn-success btn-sm" data-action="approve" data-id="${row.id}">Approve</button>`
-        : (cfg.hasApprove && row.approved ? `<span class="badge badge-green">✓ Live</span>` : '');
+      
+      let approveBtn = '';
+      if (cfg.hasApprove) {
+        if (row.approved) {
+          approveBtn = `
+            <button class="btn btn-success btn-sm" data-action="unapprove" data-id="${row.id}" title="Снять с публикации">
+              ✓ Live
+            </button>`;
+        } else {
+          approveBtn = `
+            <button class="btn btn-amber btn-sm" data-action="approve" data-id="${row.id}" title="Опубликовать">
+              Approve
+            </button>`;
+        }
+      }
       
       return `<tr data-row-id="${row.id}">
         ${cells}
@@ -1214,6 +1377,30 @@ function renderCell(col, val, row) {
   if (col === 'active') {
     return `<td><span class="badge ${val ? 'badge-green' : 'badge-gray'}">${val ? 'Активен' : 'Нет'}</span></td>`;
   }
+  if (col === 'status') {
+    const statusColors = {
+      'новая': 'badge-blue',
+      'в работе': 'badge-amber',
+      'подтверждена': 'badge-sky',
+      'завершена': 'badge-green',
+      'отменена': 'badge-red'
+    };
+    return `<td><span class="badge ${statusColors[val] || 'badge-gray'}">${val || '-'}</span></td>`;
+  }
+  if (col === 'request_number') {
+    return `<td><span class="badge badge-purple">${val || '-'}</span></td>`;
+  }
+  if (col === 'phone') {
+    return `<td><a href="tel:${val}" style="color:var(--acc)">${val || '-'}</a></td>`;
+  }
+  if (col === 'travel_date' || col === 'created_at') {
+    if (!val) return `<td>-</td>`;
+    const d = new Date(val);
+    return `<td>${d.toLocaleDateString('ru-RU')}</td>`;
+  }
+  if (col === 'vehicle_number') {
+    return `<td><span class="badge badge-gray">${val || '-'}</span></td>`;
+  }
   if (col === 'stars') {
     return `<td>${val ? '★'.repeat(parseInt(val)) : '-'}</td>`;
   }
@@ -1224,10 +1411,10 @@ function renderCell(col, val, row) {
   if (col === 'type' || col === 'cuisine' || col === 'vehicle') {
     return `<td><span class="badge badge-sky">${val || '-'}</span></td>`;
   }
-  if (['price', 'total_price', 'price_from', 'avg_check', 'entry_price', 'price_day'].includes(col)) {
+  if (['price', 'total_price', 'price_from', 'avg_check', 'entry_price', 'price_day', 'paid_amount'].includes(col)) {
     return `<td><span class="price">$${val || 0}</span></td>`;
   }
-  if (col === 'name' || col === 'display_title') {
+  if (col === 'name' || col === 'display_title' || col === 'client_name' || col === 'tour_name') {
     return `<td class="primary">${val || '-'}</td>`;
   }
   return `<td>${val !== null && val !== undefined ? val : '-'}</td>`;
@@ -1245,6 +1432,13 @@ function bindTableEvents() {
     btn.addEventListener('click', function(e) {
       e.stopPropagation();
       approveRecord(this.dataset.id);
+    });
+  });
+  
+  document.querySelectorAll('[data-action="unapprove"]').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      unapproveRecord(this.dataset.id);
     });
   });
   
@@ -2525,13 +2719,31 @@ async function deleteRecord(id) {
 }
 
 async function approveRecord(id) {
+  if (!confirm('Опубликовать эту запись в Mini App?')) return;
+  
   try {
     await supabaseRequest(currentSection, {
       method: 'PATCH',
       query: `?id=eq.${id}`,
       body: { approved: true }
     });
-    showToast('✓ Approved!', 'green');
+    showToast('✓ Опубликовано в Mini App!', 'green');
+    loadSectionData();
+  } catch (error) {
+    showToast('Ошибка: ' + error.message, 'red');
+  }
+}
+
+async function unapproveRecord(id) {
+  if (!confirm('Снять с публикации? Запись не будет отображаться в Mini App.')) return;
+  
+  try {
+    await supabaseRequest(currentSection, {
+      method: 'PATCH',
+      query: `?id=eq.${id}`,
+      body: { approved: false }
+    });
+    showToast('✓ Снято с публикации', 'blue');
     loadSectionData();
   } catch (error) {
     showToast('Ошибка: ' + error.message, 'red');
