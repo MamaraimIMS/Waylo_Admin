@@ -719,7 +719,11 @@ const SECTIONS = {
     columnLabels: { image_url: '', display_title: 'Название', city: 'Город', duration_days: 'Дней', total_price: 'Цена', approved: 'Статус' },
     fields: [
       { key: 'display_title', label: 'Название тура', type: 'text', required: true, placeholder: 'Золотой Самарканд' },
-      { key: 'badge_text', label: 'Бейдж', type: 'text', placeholder: 'AI ВЫБОР, ПОПУЛЯРНЫЙ' }
+      { key: 'badge_text', label: 'Бейдж', type: 'text', placeholder: 'AI ВЫБОР, ПОПУЛЯРНЫЙ' },
+      { key: 'city', label: 'Город', type: 'city' },
+      { key: 'duration_days', label: 'Длительность (дней)', type: 'number', placeholder: '4' },
+      { key: 'description', label: 'Описание', type: 'textarea', placeholder: 'Краткое описание тура...' },
+      { key: 'gallery', label: 'Галерея (до 50 фото, макс 100KB)', type: 'gallery' }
     ]
   },
   top_destinations: {
@@ -1508,7 +1512,7 @@ function buildForm(record) {
       let galleryVal = [];
       try { if (val) galleryVal = typeof val === 'string' ? JSON.parse(val) : val; } catch(e) {}
       
-      html += '<div class="form-group full"><label class="form-label">Галерея (до 50 фото)</label>';
+      html += `<div class="form-group full"><label class="form-label">${field.label || 'Галерея (до 50 фото, макс 100KB)'}</label>`;
       html += '<div class="gallery-grid" id="gallery-grid">';
       if (Array.isArray(galleryVal)) galleryVal.forEach((url, i) => { html += buildGalleryThumb(i, url); });
       html += '</div>';
@@ -1707,8 +1711,9 @@ function handleGalleryUpload(e) {
   const grid = document.getElementById('gallery-grid');
   if (!grid) return;
   
+  let skipped = 0;
   files.forEach(file => {
-    if (file.size > 100 * 1024) return;
+    if (file.size > 100 * 1024) { skipped++; return; }
     if (!file.type.startsWith('image/')) return;
     
     const reader = new FileReader();
@@ -1723,6 +1728,7 @@ function handleGalleryUpload(e) {
     reader.readAsDataURL(file);
   });
   e.target.value = '';
+  if (skipped > 0) showToast(`⚠️ ${skipped} фото пропущено — превышает 100 KB`, 'amber');
 }
 
 function collectGallery() {
@@ -2641,6 +2647,11 @@ async function saveRecord() {
     record[field.key] = val;
   });
   
+  // Если загружена галерея — первое фото идёт как image_url (для Mini App)
+  if (record.gallery && record.gallery.length > 0) {
+    record.image_url = record.gallery[0];
+  }
+
   if (currentSection === 'hotels' && record.rooms && record.rooms.length > 0) {
     const prices = record.rooms.map(r => r.price).filter(p => p > 0);
     if (prices.length > 0) record.price_from = Math.min(...prices);
