@@ -2668,7 +2668,7 @@ async function runMigration() {
       return;
     }
     // Колонки нет — показываем инструкцию
-    const sql = 'ALTER TABLE top_tours ADD COLUMN IF NOT EXISTS gallery JSONB DEFAULT '[]';\nALTER TABLE top_destinations ADD COLUMN IF NOT EXISTS gallery JSONB DEFAULT '[]';';
+    const sql = "ALTER TABLE top_tours ADD COLUMN IF NOT EXISTS gallery JSONB DEFAULT '[]';\nALTER TABLE top_destinations ADD COLUMN IF NOT EXISTS gallery JSONB DEFAULT '[]';";
     const msg = `Выполните в Supabase → SQL Editor:\n\n${sql}`;
     alert(msg);
     showToast('Скопируй SQL из диалога и выполни в Supabase', 'amber');
