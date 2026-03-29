@@ -431,6 +431,7 @@ td.primary{color:var(--tx);font-weight:500}
     
     <div class="sb-foot">
       <button class="logout-btn" onclick="logout()">Отключиться</button>
+      <button class="logout-btn" style="background:rgba(124,109,250,.1);color:var(--acc2);border-color:rgba(124,109,250,.25);margin-bottom:6px" onclick="runMigration()" title="Добавить колонку gallery в top_tours">⚙️ Обновить БД</button>
       <div class="conn">
         <div class="cdot" id="connDot"></div>
         <span id="connLabel">Не подключено</span>
@@ -2659,6 +2660,32 @@ function collectModules() {
 }
 
 // ============================================
+// DB MIGRATION — добавляет gallery JSONB в top_tours
+// ============================================
+async function runMigration() {
+  if (!isConnected) { showToast('Сначала подключитесь к Supabase', 'red'); return; }
+  showToast('⏳ Обновление базы данных...', 'green');
+  try {
+    // Supabase REST API не поддерживает DDL напрямую, используем rpc если есть,
+    // иначе проверяем наличие колонки через HEAD-запрос
+    const testResp = await fetch(`${SUPABASE_URL}/rest/v1/top_tours?select=gallery&limit=1`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    if (testResp.ok) {
+      showToast('✅ Колонка gallery уже существует', 'green');
+      return;
+    }
+    // Колонки нет — показываем инструкцию
+    const sql = 'ALTER TABLE top_tours ADD COLUMN IF NOT EXISTS gallery JSONB DEFAULT '[]';\nALTER TABLE top_destinations ADD COLUMN IF NOT EXISTS gallery JSONB DEFAULT '[]';';
+    const msg = `Выполните в Supabase → SQL Editor:\n\n${sql}`;
+    alert(msg);
+    showToast('Скопируй SQL из диалога и выполни в Supabase', 'amber');
+  } catch(e) {
+    showToast('Ошибка: ' + e.message, 'red');
+  }
+}
+
+// ============================================
 // SAVE / DELETE / APPROVE
 // ============================================
 async function saveRecord() {
@@ -2749,23 +2776,31 @@ async function saveRecord() {
   console.log('[saveRecord] image_url length:', record.image_url ? record.image_url.length : 0);
   console.log('[saveRecord] image_url preview:', record.image_url ? record.image_url.substring(0, 50) : 'EMPTY');
   
-  try {
+  // Пробуем сохранить с gallery. Если колонки нет — сохраняем только image_url
+  async function trySave(body) {
     if (editingId) {
-      await supabaseRequest(currentSection, {
-        method: 'PATCH',
-        query: `?id=eq.${editingId}`,
-        body: record
-      });
-      showToast('✓ Сохранено', 'green');
+      return supabaseRequest(currentSection, { method: 'PATCH', query: `?id=eq.${editingId}`, body });
     } else {
-      await supabaseRequest(currentSection, {
-        method: 'POST',
-        body: record
-      });
-      showToast('✓ Добавлено', 'green');
+      return supabaseRequest(currentSection, { method: 'POST', body });
     }
-    
-    requestCache.clear(); // сбросить кэш чтобы сразу увидеть новые данные
+  }
+
+  try {
+    try {
+      await trySave(record);
+    } catch (e) {
+      // Если ошибка из-за отсутствия колонки gallery — сохраняем без неё
+      if (record.gallery && (e.message.includes('gallery') || e.message.includes('column') || e.message.includes('400'))) {
+        const fallback = { ...record };
+        delete fallback.gallery;
+        await trySave(fallback);
+        showToast('✓ Фото сохранено в image_url (добавь колонку gallery в Supabase для полной галереи)', 'amber');
+      } else {
+        throw e;
+      }
+    }
+    showToast(editingId ? '✓ Сохранено' : '✓ Добавлено', 'green');
+    requestCache.clear();
     closeModal();
     loadSectionData();
   } catch (error) {
