@@ -1511,13 +1511,19 @@ function buildForm(record) {
     if (field.type === 'gallery') {
       let galleryVal = [];
       try { if (val) galleryVal = typeof val === 'string' ? JSON.parse(val) : val; } catch(e) {}
+      if (!Array.isArray(galleryVal)) galleryVal = [];
+      
+      // КЛЮЧЕВОЙ ФИШ: если gallery пустая, но image_url есть — показываем его
+      if (galleryVal.length === 0 && record && record.image_url) {
+        galleryVal = [record.image_url];
+      }
       
       html += `<div class="form-group full"><label class="form-label">${field.label || 'Галерея (до 50 фото, макс 100KB)'}</label>`;
       html += '<div class="gallery-grid" id="gallery-grid">';
-      if (Array.isArray(galleryVal)) galleryVal.forEach((url, i) => { html += buildGalleryThumb(i, url); });
+      galleryVal.forEach((url, i) => { html += buildGalleryThumb(i, url); });
       html += '</div>';
       html += '<label class="btn btn-ghost btn-sm" style="cursor:pointer">📁 Загрузить<input type="file" accept="image/*" multiple style="display:none" onchange="handleGalleryUpload(event)"></label>';
-      html += '<span id="gallery-count" style="font-size:11px;color:var(--tx3);margin-left:10px">' + (galleryVal.length || 0) + '/50</span>';
+      html += '<span id="gallery-count" style="font-size:11px;color:var(--tx3);margin-left:10px">' + galleryVal.length + '/50</span>';
       html += '</div>';
       return;
     }
@@ -1581,13 +1587,31 @@ function updatePhotoPreview() {
 }
 
 // ============================================
-// PHOTO UPLOAD (base64 → Supabase TEXT field)
+// PHOTO UPLOAD — сжатие через Canvas → base64
 // ============================================
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = ev => resolve(ev.target.result);
     reader.onerror = () => reject(new Error('Ошибка чтения файла'));
+    reader.onload = ev => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('Ошибка декодирования изображения'));
+      img.onload = () => {
+        // Сжимаем до макс 800px по длинной стороне
+        const MAX = 800;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else       { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        // Качество 0.82 → ~20-40KB для типичного фото
+        resolve(canvas.toDataURL('image/jpeg', 0.82));
+      };
+      img.src = ev.target.result;
+    };
     reader.readAsDataURL(file);
   });
 }
@@ -1692,8 +1716,10 @@ function collectRooms() {
 // GALLERY
 // ============================================
 function buildGalleryThumb(i, url) {
-  return `<div class="gallery-thumb" id="gth-${i}" data-url="${url.startsWith('data:') ? '__b64__' : url}">
-    <img src="${url}" onerror="this.style.opacity=0.3" style="pointer-events:none">
+  // Сохраняем полный URL/base64 в data-атрибут — img.src браузер может изменить
+  const escaped = url.replace(/"/g, '&quot;');
+  return `<div class="gallery-thumb" id="gth-${i}">
+    <img src="${url}" data-full="${escaped}" onerror="this.style.opacity=0.3" style="pointer-events:none">
     <button type="button" class="remove-btn" onclick="removeGalleryPhoto(${i})">✕</button>
   </div>`;
 }
@@ -1746,12 +1772,10 @@ function collectGallery() {
   const grid = document.getElementById('gallery-grid');
   if (!grid) return [];
   const urls = [];
-  grid.querySelectorAll('[id^="gth-"]').forEach(thumb => {
-    const img = thumb.querySelector('img');
-    if (img && img.src && img.src.length > 10) {
-      // base64 или URL — берём img.src напрямую
-      urls.push(img.src);
-    }
+  grid.querySelectorAll('[id^="gth-"] img').forEach(img => {
+    // Берём data-full (оригинальный base64/URL), если нет — img.src
+    const src = img.getAttribute('data-full') || img.src;
+    if (src && src.length > 10) urls.push(src);
   });
   return urls;
 }
@@ -2688,9 +2712,11 @@ async function saveRecord() {
       const firstWithCity = enabledModules.find(m => m.city);
       if (firstWithCity) record.city = firstWithCity.city;
       
-      // Фото = фото первого модуля с изображением
-      const firstWithImage = enabledModules.find(m => m.image_url);
-      if (firstWithImage) record.image_url = firstWithImage.image_url;
+      // Фото из модуля — только если пользователь НЕ загрузил своё фото
+      if (!record.image_url) {
+        const firstWithImage = enabledModules.find(m => m.image_url);
+        if (firstWithImage) record.image_url = firstWithImage.image_url;
+      }
       
       // Количество дней = количество модулей hotels (ночей) + 1
       const hotelNights = enabledModules.filter(m => m.type === 'hotels').reduce((sum, m) => sum + (m.nights || 1), 0);
@@ -2706,6 +2732,11 @@ async function saveRecord() {
   
   document.getElementById('saveBtn').disabled = true;
   document.getElementById('saveBtn').textContent = 'Сохранение...';
+
+  // Диагностика: логируем что уходит в Supabase
+  console.log('[saveRecord] section:', currentSection);
+  console.log('[saveRecord] image_url length:', record.image_url ? record.image_url.length : 0);
+  console.log('[saveRecord] image_url preview:', record.image_url ? record.image_url.substring(0, 50) : 'EMPTY');
   
   try {
     if (editingId) {
