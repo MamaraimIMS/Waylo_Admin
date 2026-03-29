@@ -1088,34 +1088,26 @@ function clearSupabaseCache() {
 // ПОДКЛЮЧЕНИЕ К SUPABASE
 // ============================================
 async function connectSupabase() {
-  const password = document.getElementById('inputPassword').value;
-  
+  const password = document.getElementById('inputPassword').value.trim();
+
   if (password !== ADMIN_PASSWORD) {
     document.getElementById('loginError').textContent = 'Неверный пароль';
     return;
   }
-  
+
+  // Пароль верный — сразу открываем панель
   document.getElementById('loginError').textContent = '';
-  document.getElementById('loginSuccess').textContent = 'Подключение к Supabase...';
+  document.getElementById('loginSuccess').textContent = '✓ Входим...';
   document.getElementById('connectBtn').disabled = true;
-  
-  try {
-    await supabaseRequest('top_tours', { query: '?limit=1' });
-    
-    isConnected = true;
-    document.getElementById('loginSuccess').textContent = '✓ Подключено!';
-    
-    setTimeout(() => {
-      document.getElementById('lock').style.display = 'none';
-      document.getElementById('app').style.display = 'block';
-      updateConnectionStatus();
-      initApp();
-    }, 300);
-  } catch (error) {
-    document.getElementById('loginError').textContent = 'Ошибка подключения к базе';
-    document.getElementById('loginSuccess').textContent = '';
-    document.getElementById('connectBtn').disabled = false;
-  }
+
+  document.getElementById('lock').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  initApp();
+
+  // Supabase проверяем в фоне — не блокирует вход
+  supabaseRequest('top_tours', { query: '?limit=1' })
+    .then(() => { isConnected = true; updateConnectionStatus(); })
+    .catch(() => { isConnected = false; updateConnectionStatus(); });
 }
 
 function updateConnectionStatus() {
