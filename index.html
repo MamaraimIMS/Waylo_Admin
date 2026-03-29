@@ -2651,6 +2651,10 @@ async function saveRecord() {
   if (record.gallery && record.gallery.length > 0) {
     record.image_url = record.gallery[0];
   }
+  // top_tours и top_destinations не имеют колонки gallery в Supabase — удаляем из payload
+  if (currentSection === 'top_tours' || currentSection === 'top_destinations') {
+    delete record.gallery;
+  }
 
   if (currentSection === 'hotels' && record.rooms && record.rooms.length > 0) {
     const prices = record.rooms.map(r => r.price).filter(p => p > 0);
