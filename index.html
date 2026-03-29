@@ -2776,25 +2776,20 @@ async function saveRecord() {
   console.log('[saveRecord] image_url length:', record.image_url ? record.image_url.length : 0);
   console.log('[saveRecord] image_url preview:', record.image_url ? record.image_url.substring(0, 50) : 'EMPTY');
   
-  // Пробуем сохранить с gallery. Если колонки нет — сохраняем только image_url
-  async function trySave(body) {
-    if (editingId) {
-      return supabaseRequest(currentSection, { method: 'PATCH', query: `?id=eq.${editingId}`, body });
-    } else {
-      return supabaseRequest(currentSection, { method: 'POST', body });
-    }
-  }
+  // Сохраняем — при ошибке из-за отсутствия gallery-колонки повторяем без неё
+  const doSave = (body) => editingId
+    ? supabaseRequest(currentSection, { method: 'PATCH', query: `?id=eq.${editingId}`, body })
+    : supabaseRequest(currentSection, { method: 'POST', body });
 
   try {
     try {
-      await trySave(record);
+      await doSave(record);
     } catch (e) {
-      // Если ошибка из-за отсутствия колонки gallery — сохраняем без неё
       if (record.gallery && (e.message.includes('gallery') || e.message.includes('column') || e.message.includes('400'))) {
-        const fallback = { ...record };
+        const fallback = Object.assign({}, record);
         delete fallback.gallery;
-        await trySave(fallback);
-        showToast('✓ Фото сохранено в image_url (добавь колонку gallery в Supabase для полной галереи)', 'amber');
+        await doSave(fallback);
+        showToast('✓ Фото сохранено. Добавь колонку gallery в Supabase для полной галереи', 'amber');
       } else {
         throw e;
       }
