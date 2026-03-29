@@ -1592,7 +1592,7 @@ function updatePhotoPreview() {
 // PHOTO UPLOAD — сжатие через Canvas → base64
 // ============================================
 function fileToBase64(file) {
-  // Сжатие: макс 500px, quality 0.60 → ~8-15KB base64 — надёжно сохраняется в Supabase TEXT
+  // Сжатие: макс 400px, quality 0.50 → ~5-8KB × 50 фото = ~300KB — безопасно для JSONB
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onerror = () => reject(new Error('Ошибка чтения файла'));
@@ -1600,7 +1600,7 @@ function fileToBase64(file) {
       const img = new Image();
       img.onerror = () => reject(new Error('Ошибка декодирования'));
       img.onload = () => {
-        const MAX = 500;
+        const MAX = 400;
         let w = img.width, h = img.height;
         const ratio = Math.min(MAX / w, MAX / h, 1);
         w = Math.round(w * ratio);
@@ -1608,7 +1608,7 @@ function fileToBase64(file) {
         const canvas = document.createElement('canvas');
         canvas.width = w; canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/jpeg', 0.60));
+        resolve(canvas.toDataURL('image/jpeg', 0.50));
       };
       img.src = ev.target.result;
     };
@@ -1748,6 +1748,9 @@ async function handleGalleryUpload(e) {
   e.target.value = '';
 
   for (const file of files) {
+    // Проверяем лимит 50 фото
+    const current = grid.querySelectorAll('[id^="gth-"]').length;
+    if (current >= 50) { showToast('Максимум 50 фото', 'amber'); break; }
     if (file.size > 100 * 1024) { skipped++; continue; }
     if (!file.type.startsWith('image/')) continue;
     try {
@@ -2697,8 +2700,9 @@ async function saveRecord() {
   if (record.gallery && record.gallery.length > 0) {
     record.image_url = record.gallery[0];
   }
-  // top_tours и top_destinations не имеют колонки gallery в Supabase — удаляем из payload
-  if (currentSection === 'top_tours' || currentSection === 'top_destinations') {
+  // top_destinations не имеет колонки gallery — удаляем
+  // top_tours теперь имеет колонку gallery JSONB — НЕ удаляем!
+  if (currentSection === 'top_destinations') {
     delete record.gallery;
   }
 
