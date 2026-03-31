@@ -2756,12 +2756,13 @@ async function saveRecord() {
       const hotelNights = enabledModules.filter(m => m.type === 'hotels').reduce((sum, m) => sum + (m.nights || 1), 0);
       if (hotelNights > 0) record.duration_days = hotelNights + 1;
       
-      // Рейтинг = средний рейтинг модулей
-      const ratings = enabledModules.map(m => m.rating).filter(r => r > 0);
-      if (ratings.length > 0) {
-        record.rating = Math.round((ratings.reduce((a, b) => a + b, 0) / ratings.length) * 10) / 10;
-      }
+      // Рейтинг вычисляем но НЕ сохраняем в top_tours (нет такой колонки)
+      // record.rating остаётся только если есть в схеме таблицы
     }
+  }
+  // top_tours: удаляем поля которых нет в таблице Supabase
+  if (currentSection === 'top_tours') {
+    delete record.rating;
   }
   
   document.getElementById('saveBtn').disabled = true;
