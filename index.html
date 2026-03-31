@@ -961,6 +961,7 @@ let currentSection = 'top_tours';
 let allData = [];
 let filteredData = [];
 let editingId = null;
+let editingSection = 'top_tours'; // раздел зафиксированный при открытии модала
 let moduleCounter = 1000;
 let isConnected = false;
 
@@ -1459,6 +1460,7 @@ function bindTableEvents() {
 // ============================================
 function openAddModal() {
   editingId = null;
+  editingSection = currentSection; // фиксируем раздел
   document.getElementById('modalTitle').textContent = 'Добавить';
   buildForm(null);
   document.getElementById('modal').classList.add('open');
@@ -1466,6 +1468,7 @@ function openAddModal() {
 
 function openEditModal(id) {
   editingId = id;
+  editingSection = currentSection; // фиксируем раздел
   const record = allData.find(r => r.id === id);
   document.getElementById('modalTitle').textContent = 'Редактировать';
   buildForm(record);
@@ -2681,7 +2684,7 @@ async function runMigration() {
 // SAVE / DELETE / APPROVE
 // ============================================
 async function saveRecord() {
-  const cfg = SECTIONS[currentSection];
+  const cfg = SECTIONS[editingSection]; // используем зафиксированный раздел
   const record = {};
   
   cfg.fields.forEach(field => {
@@ -2721,15 +2724,15 @@ async function saveRecord() {
   }
   // top_destinations не имеет колонки gallery — удаляем
   // top_tours теперь имеет колонку gallery JSONB — НЕ удаляем!
-  if (currentSection === 'top_destinations') {
+  if (editingSection === 'top_destinations') {
     delete record.gallery;
   }
   // sights: удаляем rating (заменён на description), оставляем только нужные поля
-  if (currentSection === 'sights') {
+  if (editingSection === 'sights') {
     delete record.rating;
   }
 
-  if (currentSection === 'hotels' && record.rooms && record.rooms.length > 0) {
+  if (editingSection === 'hotels' && record.rooms && record.rooms.length > 0) {
     const prices = record.rooms.map(r => r.price).filter(p => p > 0);
     if (prices.length > 0) record.price_from = Math.min(...prices);
   }
@@ -2761,7 +2764,7 @@ async function saveRecord() {
     }
   }
   // top_tours: удаляем поля которых нет в таблице Supabase
-  if (currentSection === 'top_tours') {
+  if (editingSection === 'top_tours') {
     delete record.rating;
   }
   
@@ -2775,8 +2778,8 @@ async function saveRecord() {
   
   // Сохраняем — при ошибке из-за отсутствия gallery-колонки повторяем без неё
   const doSave = (body) => editingId
-    ? supabaseRequest(currentSection, { method: 'PATCH', query: `?id=eq.${editingId}`, body })
-    : supabaseRequest(currentSection, { method: 'POST', body });
+    ? supabaseRequest(editingSection, { method: 'PATCH', query: `?id=eq.${editingId}`, body })
+    : supabaseRequest(editingSection, { method: 'POST', body });
 
   try {
     try {
