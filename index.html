@@ -1019,11 +1019,14 @@ async function supabaseRequest(table, options = {}) {
       console.log(`[Supabase] Response: ${response.status}`, responseText.substring(0, 100));
       
       if (!response.ok) {
-        // 404 - таблица не существует, не retry
-        if (response.status === 404 || response.status === 400) {
-          throw new Error(`Table "${table}" not found or invalid query`);
-        }
-        throw new Error(`${response.status}: ${responseText}`);
+        // Парсим реальную ошибку от Supabase
+        let errMsg = `${response.status}: ${responseText}`;
+        try {
+          const errJson = JSON.parse(responseText);
+          errMsg = errJson.message || errJson.error || errMsg;
+        } catch(e) {}
+        console.error(`[Supabase] Error ${response.status} on ${table}:`, errMsg);
+        throw new Error(errMsg);
       }
       
       let result = [];
@@ -2785,11 +2788,14 @@ async function saveRecord() {
     try {
       await doSave(record);
     } catch (e) {
-      if (record.gallery && (e.message.includes('gallery') || e.message.includes('column') || e.message.includes('400'))) {
+      // Если ошибка — пробуем без gallery (может быть слишком большой payload)
+      if (record.gallery && record.gallery.length > 0) {
+        console.warn('[save] Retrying without gallery. Error:', e.message);
         const fallback = Object.assign({}, record);
         delete fallback.gallery;
+        // image_url оставляем как есть (уже сжатый base64)
         await doSave(fallback);
-        showToast('✓ Фото сохранено. Добавь колонку gallery в Supabase для полной галереи', 'amber');
+        showToast('✓ Запись сохранена. Загрузи фото через Storage для полной галереи', 'amber');
       } else {
         throw e;
       }
