@@ -667,9 +667,9 @@ let localData = {
     { id: 'tr2', name: 'Ташкент → Самарканд', from_city: 'Ташкент', to_city: 'Самарканд', vehicle: 'поезд', price: 25, duration_hours: 2, active: true }
   ],
   sights: [
-    { id: 's1', name: 'Площадь Регистан', city: 'Самарканд', type: 'UNESCO', entry_price: 8, rating: 9.8, image_url: 'https://uzbekistan.travel/storage/app/media/uploaded-files/1440x810-4.jpg', active: true },
-    { id: 's2', name: 'Ичан-Кала', city: 'Хива', type: 'UNESCO', entry_price: 10, rating: 9.7, image_url: 'https://uzbekistan.travel/storage/app/media/uploaded-files/khiva-1440x810.jpg', active: true },
-    { id: 's3', name: 'Ляби-хауз', city: 'Бухара', type: 'площадь', entry_price: 0, rating: 9.4, image_url: '', active: true }
+    { id: 's1', name: 'Площадь Регистан', city: 'Самарканд', type: 'UNESCO', entry_price: 8, description: '', image_url: 'https://uzbekistan.travel/storage/app/media/uploaded-files/1440x810-4.jpg', active: true },
+    { id: 's2', name: 'Ичан-Кала', city: 'Хива', type: 'UNESCO', entry_price: 10, description: '', image_url: 'https://uzbekistan.travel/storage/app/media/uploaded-files/khiva-1440x810.jpg', active: true },
+    { id: 's3', name: 'Ляби-хауз', city: 'Бухара', type: 'площадь', entry_price: 0, description: '', image_url: '', active: true }
   ],
   restaurants: [
     { id: 'r1', name: 'Центр плова', city: 'Ташкент', cuisine: 'узбекская', avg_check: 8, rating: 9.3, image_url: '', active: true },
@@ -2723,6 +2723,10 @@ async function saveRecord() {
   // top_tours теперь имеет колонку gallery JSONB — НЕ удаляем!
   if (currentSection === 'top_destinations') {
     delete record.gallery;
+  }
+  // sights: удаляем rating (заменён на description), оставляем только нужные поля
+  if (currentSection === 'sights') {
+    delete record.rating;
   }
 
   if (currentSection === 'hotels' && record.rooms && record.rooms.length > 0) {
