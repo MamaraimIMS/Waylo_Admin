@@ -796,10 +796,10 @@ const SECTIONS = {
     fields: [
       { key: 'name', label: 'Название', type: 'text', required: true },
       { key: 'gallery', label: 'Галерея (до 50 фото, макс 100KB)', type: 'gallery' },
-      { key: 'city', label: 'Город', type: 'city' },
-      { key: 'type', label: 'Тип', type: 'select', options: ['UNESCO', 'мавзолей', 'мечеть', 'медресе', 'крепость', 'площадь'] },
+      { key: 'city', label: 'Город', type: 'text', placeholder: 'Введите город' },
+      { key: 'type', label: 'Тип', type: 'text', placeholder: 'Введите тип локации' },
       { key: 'entry_price', label: 'Цена входа ($)', type: 'number' },
-      { key: 'rating', label: 'Рейтинг', type: 'number' },
+      { key: 'description', label: 'Комментарий', type: 'textarea', placeholder: 'Описание и информация о локации...' },
       { key: 'active', label: 'Активен', type: 'boolean' }
     ]
   },
